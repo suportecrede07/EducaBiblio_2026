@@ -9,10 +9,9 @@ try {
         date_default_timezone_set('America/Fortaleza'); // Configurar o fuso horário
         $dataAtualUsuario = date("Y-m-d");
 
-        // Consulta SQL para obter os dados da tabela de devolução
-        $sql = "SELECT d.DataDevolucao, e.idEmprestimo, e.StatusEmprestimo
-                FROM devolucao d
-                INNER JOIN emprestimo e ON d.emprestimo_idEmprestimo = e.idEmprestimo";
+        // Consulta SQL para obter os dados da tabela de empréstimo
+        $sql = "SELECT e.DataEmprestimo, e.idEmprestimo, e.StatusEmprestimo
+                FROM emprestimo e";
         $stmt = $conn->prepare($sql);
 
         if ($stmt) {
@@ -20,13 +19,13 @@ try {
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             foreach ($result as $row) {
-                $dataDevolucao = $row['DataDevolucao'];
+                $dataEmprestimo = $row['DataEmprestimo'];
                 $idEmprestimo = $row['idEmprestimo'];
                 $statusEmprestimo = $row['StatusEmprestimo'];
 
-                // Comparar a data atual do usuário com a DataDevolucao
-                if ($dataAtualUsuario > $dataDevolucao && ($statusEmprestimo !== '2' && $statusEmprestimo !== '4')) {
-                    // Se a data do usuário passou da DataDevolucao e o StatusEmprestimo não é 2 ou 4, atualize para 1
+                // Comparar a data atual do usuário com a DataEmprestimo
+                if ($dataAtualUsuario > $dataEmprestimo && ($statusEmprestimo == '0' || $statusEmprestimo == '1')) {
+                    // Se a data atual estiver atrasada e o livro não tiver sido devolvido (status 0 ou 1), atualize para 1
                     $sqlUpdate = "UPDATE emprestimo SET StatusEmprestimo = '1' WHERE idEmprestimo = :idEmprestimo";
                     $stmtUpdate = $conn->prepare($sqlUpdate);
 
@@ -38,7 +37,6 @@ try {
                     }
                 }
             }
-            //   echo "Status de empréstimo atualizado com sucesso!";
         } else {
             echo "Erro na execução da consulta.";
         }
@@ -48,3 +46,4 @@ try {
 } catch (PDOException $e) {
     echo "Erro: " . $e->getMessage();
 }
+?>

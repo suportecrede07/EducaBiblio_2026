@@ -118,6 +118,8 @@ INSERT INTO `genero` (`idGenero`, `NomeGenero`) VALUES
 (7, 'Poesia'),
 (8, 'Romance'),
 (9, 'Outro');
+(10, 'Outro');
+(11, 'Quadrinhos');
 
 -- --------------------------------------------------------
 
