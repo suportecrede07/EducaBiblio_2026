@@ -131,69 +131,67 @@ $conn = $conexao->getConnection();
 
 			<section class="tabela">
 
-				<div class="row">
-					<form action="../Router/emp_rotas.php" method="post">
-						<h3>Empréstimo de livros</h3>
-						<input type="text" placeholder="ID" name="idEmprestimo" id="idEmprestimo" class="box2" autocomplete="off" readonly>
-						<select id="Genero_idGenero" name="Genero_idGenero" class="box select-dark-mode" value="genero" required onchange="javascript:associaInput();">
-							<option value="">Selecione um gênero</option>
-							<?php
-							// Preencha as opções de gênero a partir do banco de dados.
-							$query = "SELECT idGenero, NomeGenero FROM genero";
-							$stmt = $conn->query($query);
-							while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-								echo "<option value='" . $row['idGenero'] . "'>" . $row['NomeGenero'] . "</option>";
-							}
-							?>
-						</select>
-						<select id="livro_idLivro" name="livro_idLivro" class="box select-dark-mode">
-							<option value="">Selecione um livro</option>
-							<!-- Opções de livros serão preenchidas dinamicamente com JavaScript -->
-						</select>
-						<select id="Turma_idTurma" name="Turma_idTurma" class="box select-dark-mode" required>
-							<option value="">Selecione uma turma</option>
-							<option value="0">Professor</option>
-							<?php
-							// Preencha as opções de turma a partir do banco de dados.
-							$query = "SELECT IdTurma, AnodeInicio, AnoTurma, NomeTurma FROM turma";
-							$stmt = $conn->query($query);
-							while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-								echo "<option value='" . $row['IdTurma'] . "'>" . $row['AnoTurma'] . 'º ' . $row['NomeTurma'] . "</option>";
-							}
-							?>
-						</select>
-						<select id="aluno_idAluno" name="aluno_idAluno" class="box select-dark-mode">
-							<option value="">Selecione um aluno</option>
-							<!-- Opções de alunos serão preenchidas dinamicamente com JavaScript -->
-						</select>
-						<select id="prof_idProf" name="prof_idProf" class="box select-dark-mode">
-							<option value="">Selecione um prof</option>
-							<!-- Opções de prof serão preenchidas dinamicamente com JavaScript -->
-						</select>
-						<h4>Data do empréstimo:</h4>
-						<input type="date" placeholder="DD/MM/AAAA" name="DataEmprestimo" id="DataEmprestimo" required class="box" autocomplete="off" required>
+						<div class="row">
+							<form action="../Router/emp_rotas.php" method="post">
+								<h3>Empréstimo de livros</h3>
+								<input type="text" placeholder="ID" name="idEmprestimo" id="idEmprestimo" required maxlength="50" class="box2" autocomplete="off" readonly>
+								<select id="Genero_idGenero" name="Genero_idGenero" class="box select-dark-mode" required>
+									<option value="">Selecione um gênero</option>
+									<?php
+									// Preencha as opções de gênero a partir do banco de dados.
+									$query = "SELECT idGenero, NomeGenero FROM genero";
+									$stmt = $conn->query($query);
+									while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+										echo "<option value='" . $row['idGenero'] . "'>" . $row['NomeGenero'] . "</option>";
+									}
+									?>
+								</select>
+								<select id="livro_idLivro" name="livro_idLivro" class="box select-dark-mode">
+									<option value="">Selecione um livro</option>
+									<!-- Opções de livros serão preenchidas dinamicamente com JavaScript -->
+								</select>
+								<select id="Turma_idTurma" name="Turma_idTurma" class="box select-dark-mode" required>
+									<option value="">Selecione uma turma</option>
+									<option value="0">Professor</option>
+									<?php
+									// Preencha as opções de turma a partir do banco de dados.
+									$query = "SELECT IdTurma, AnodeInicio, AnoTurma, NomeTurma FROM turma";
+									$stmt = $conn->query($query);
+									while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+										echo "<option value='" . $row['IdTurma'] . "'>" . $row['AnoTurma'] . 'º ' . $row['NomeTurma'] . "</option>";
+									}
+									?>
+								</select>
+								<select id="aluno_idAluno" name="aluno_idAluno" class="box select-dark-mode">
+									<option value="">Selecione um aluno</option>
+									<!-- Opções de alunos serão preenchidas dinamicamente com JavaScript -->
+								</select>
+								<select id="prof_idProf" name="prof_idProf" class="box select-dark-mode">
+									<option value="">Selecione um prof</option>
+									<!-- Opções de prof serão preenchidas dinamicamente com JavaScript -->
+								</select>
+								<h4>Data do empréstimo:</h4>
+								<input type="date" placeholder="DD/MM/AAAA" name="DataEmprestimo" id="DataEmprestimo" required class="box" autocomplete="off" required>
 
-						<input type="text" placeholder="Quantidade" name="quantidade" required class="box" autocomplete="off" required>
 
-						<h4>Data da devolução:</h4>
-						<input type="date" placeholder="Data" name="data" id="DataDevolucao" required class="box" autocomplete="off" required>
+								
+								<input type="text" placeholder="Quantidade" name="quantidade" required class="box" autocomplete="off" required>
 
-						<style>
-							h4 {
-								margin-right: 87% !important;
-							}
-						</style>
-						<select id="usuario_idUsuario" name="usuario_idUsuario" class="box select-dark-mode" required>
-							<option value="">Selecione um usuário</option>
-							<?php
-							// Preencha as opções de usuário a partir do banco de dados.
-							$query = "SELECT idUsuario, UserUsuario FROM usuario";
-							$stmt = $conn->query($query);
-							while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-								echo "<option value='" . $row['idUsuario'] . "'>" . $row['UserUsuario'] . "</option>";
-							}
-							?>
-						</select>
+								<h4>Data da devolução:</h4>
+								<input type="date" placeholder="Data" name="data" required class="box" autocomplete="off" required>
+								
+
+								<select id="usuario_idUsuario" name="usuario_idUsuario" class="box select-dark-mode" required>
+									<option value="">Selecione um usuário</option>
+									<?php
+									// Preencha as opções de usuário a partir do banco de dados.
+									$query = "SELECT idUsuario, UserUsuario FROM usuario";
+									$stmt = $conn->query($query);
+									while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+										echo "<option value='" . $row['idUsuario'] . "'>" . $row['UserUsuario'] . "</option>";
+									}
+									?>
+								</select>
 
 						<center> <input type="submit" value="Enviar" class="inline-btn" name="emprestar"> </center>
 					</form>
@@ -292,17 +290,17 @@ $conn = $conexao->getConnection();
 
 						$result = $conn->query($sql);
 
-						if ($result === false) {
-							// Use errorInfo para obter informações sobre o erro
-							$errorInfo = $conn->errorInfo();
-							echo "Erro na consulta SQL: " . $errorInfo[2];
-						} else {
-							if ($result->rowCount() > 0) {
-								$emprestimos = $result->fetchAll(PDO::FETCH_ASSOC);
-								$emprestimosPorPagina = 50;
-								$paginaAtual = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
-								$indiceInicial = ($paginaAtual - 1) * $emprestimosPorPagina;
-								$emprestimosExibidos = array_slice($emprestimos, $indiceInicial, $emprestimosPorPagina);
+if ($result === false) {
+    // Use errorInfo para obter informações sobre o erro
+    $errorInfo = $conn->errorInfo();
+    echo "Erro na consulta SQL: " . $errorInfo[2];
+} else {
+    if ($result->rowCount() > 0) {
+        $emprestimos = $result->fetchAll(PDO::FETCH_ASSOC);
+        $emprestimosPorPagina = 3;
+        $paginaAtual = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+        $indiceInicial = ($paginaAtual - 1) * $emprestimosPorPagina;
+        $emprestimosExibidos = array_slice($emprestimos, $indiceInicial, $emprestimosPorPagina);
 
 								// Exibir a tabela de empréstimos
 								echo "<table>";
@@ -339,19 +337,17 @@ $conn = $conexao->getConnection();
 										echo "<td><center>" . $row["NomeLeitor"] . "</center></td>";
 									}
 
-									// Verifica se a data de empréstimo está definida antes de formatar
-									echo "<td><center>" . ($row["DataEmprestimo"] ? date('d-m-Y', strtotime($row["DataEmprestimo"])) : "Data não disponível") . "</center></td>";
+            // Verifica se a data de empréstimo está definida antes de formatar
+            echo "<td><center>" . ($row["DataEmprestimo"] ? date('d/m/Y', strtotime($row["DataEmprestimo"])) : "Data não disponível") . "</center></td>";
 
-									// Verifica se a data de devolução está definida antes de formatar
-									echo "<td><center>" . ($row["DataDevolucao"] ? date('d-m-Y', strtotime($row["DataDevolucao"])) : "Data não disponível") . "</center></td>";
+            // Verifica se a data de devolução está definida antes de formatar
+            echo "<td><center>" . ($row["DataDevolucao"] ? date('d/m/Y', strtotime($row["DataDevolucao"])) : "Data não disponível") . "</center></td>";
 
-									echo "<td><center>" . $row["Quantidade_emp"] . "</center></td>";
-									echo "<td><center>" . $row["UserUsuario"] . "</center></td>";
-
-									//Botão editar precisando de melhoras na lógica 
-									echo "<td><center><button class='edit-button'><i class='fas fa-pencil-alt'></i></button></center></td>";
-									echo "</tr>";
-								}
+            echo "<td><center>" . $row["Quantidade_emp"] . "</center></td>";
+            echo "<td><center>" . $row["UserUsuario"] . "</center></td>";
+            echo "<td><center><button class='edit-button'><i class='fas fa-pencil-alt'></i></button></center></td>";
+            echo "</tr>";
+        }
 
 								echo "</tbody>";
 								echo "</table>";
@@ -396,32 +392,30 @@ $conn = $conexao->getConnection();
 <script src="../ArquivosExternos/Jquery.js"></script>
 
 <script>
-	$(document).ready(function() {
-		// Capturar clique no botão de edição
-		$('.edit-button').click(function() {
-			// Obter o ID do empréstimo da linha correspondente na tabela
-			var idEmprestimo = $(this).closest('tr').find('td:eq(2)').text(); // ID do empréstimo na segunda coluna, ajuste conforme a estrutura real da sua tabela
-			var idEmprestimo = $(this).closest('tr').find('td:eq(2)').text();
-			
-			// Preencher o formulário com o ID do empréstimo
-			preencherFormularioID(idEmprestimo);
-			  // Chama a função para preencher o formulário com o ID do empréstimo
+    $(document).ready(function() {
+    // Capturar clique no botão de edição
+    $('.edit-button').click(function() {
+        // Obter o ID do empréstimo da linha correspondente na tabela
+        var idEmprestimo = $(this).closest('tr').find('td:eq(2)').text(); // ID do empréstimo na segunda coluna, ajuste conforme a estrutura real da sua tabela
+        
+        // Preencher o formulário com o ID do empréstimo
+        preencherFormulario(idEmprestimo); // Chama a função para preencher o formulário com o ID do empréstimo
 
-			// Alterar o modo de ação para editar
-			$('#modoAcao').val('editar');
-			// Alterar o valor do botão para refletir a ação de edição
-			$('input[type="submit"]').val('Editar');
-			// Modificar o action do formulário para o script responsável pela atualização
-			$('form').attr('action', '../Router/Atualizar_emprotas.php');
-			// Modificar o texto do botão de envio para "Atualizar"
-			$('input[type="submit"]').attr('name', 'Editar');
-		});
-	});
+        // Alterar o modo de ação para editar
+        $('#modoAcao').val('editar');
+        // Alterar o valor do botão para refletir a ação de edição
+        $('input[type="submit"]').val('Editar');
+        // Modificar o action do formulário para o script responsável pela atualização
+        $('form').attr('action', '../router/Atualizar_emprotas.php');
+        // Modificar o texto do botão de envio para "Atualizar"
+        $('input[type="submit"]').attr('name', 'Editar');
+    });
+});
 
-	// Função para preencher o formulário com o ID do empréstimo ao clicar no botão de edição
-	function preencherFormularioID(idEmprestimo) {
-		$('#idEmprestimo').val(idEmprestimo);
-	}
+// Função para preencher o formulário com o ID do empréstimo ao clicar no botão de edição
+function preencherFormulario(idEmprestimo) {
+    $('#idEmprestimo').val(idEmprestimo);
+}
 
 </script>
 

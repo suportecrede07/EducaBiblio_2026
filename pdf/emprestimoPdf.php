@@ -13,8 +13,7 @@ $sqlAlunos = "
         emprestimo.DataEmprestimo,
         devolucao.DataDevolucao,
         emprestimo.Quantidade_emp,
-        usuario.UserUsuario,
-        livro.idLivro
+        usuario.UserUsuario
     FROM emprestimo
     LEFT JOIN aluno ON emprestimo.aluno_idAluno = aluno.idAluno
     INNER JOIN livro ON emprestimo.livro_idLivro = livro.idLivro
@@ -34,8 +33,7 @@ $sqlProfessores = "
         emprestimo.DataEmprestimo,
         devolucao.DataDevolucao,
         emprestimo.Quantidade_emp,
-        usuario.UserUsuario,
-        livro.idLivro
+        usuario.UserUsuario
     FROM emprestimo
     LEFT JOIN prof ON emprestimo.prof_idProf = prof.idProf
     INNER JOIN livro ON emprestimo.livro_idLivro = livro.idLivro

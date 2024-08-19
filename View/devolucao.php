@@ -186,10 +186,10 @@ $conn = $conexao->getConnection();
                             $conexao = new CConexao();
                             $conn = $conexao->getConnection();
 
-                            // Variáveis de paginação
-                            $livrosPorPagina = 25;
-                            $paginaAtual = isset($_GET['pagina']) ? $_GET['pagina'] : 1;
-                            $inicio = ($paginaAtual - 1) * $livrosPorPagina;
+// Variáveis de paginação
+$livrosPorPagina = 3;
+$paginaAtual = isset($_GET['pagina']) ? $_GET['pagina'] : 1;
+$inicio = ($paginaAtual - 1) * $livrosPorPagina;
 
                             // Consulta SQL para recuperar empréstimos de alunos e professores
                             $queryEmprestimos = "SELECT e.idEmprestimo, 
@@ -254,9 +254,9 @@ $conn = $conexao->getConnection();
                                             break;
                                     }
 
-                                    echo '<tr>';
-                                    echo '<td><center>' . $row['idEmprestimo'] . '</center></td>';
-                                    echo '<td><center>' . $row['Leitor'] . '</center></td>';
+        echo '<tr>';
+echo '<td><center>' . $row['idLeitor'] . '</center></td>';
+echo '<td><center>' . $row['Leitor'] . '</center></td>';
 
                                     // Verifica se o campo de Turma está vazio e se o campo Nomeprof não está vazio para exibir o nome do professor
                                     if (empty($row['Turma']) && !empty($row['Nomeprof'])) {
@@ -265,30 +265,28 @@ $conn = $conexao->getConnection();
                                         echo '<td><center>' . $row['Turma'] . '</center></td>';
                                     }
 
-                                    echo '<td><center>' . $row['Livro'] . '</center></td>';
-                                    echo '<td><center>' . ($row['DataDevolucao'] ? date('d-m-Y', strtotime($row["DataDevolucao"])) : "Data não disponível") .  '</center></td>';
-                                    echo '<td><center><span class="' . $classeCSS . '">' . $estado . '</span></center></td>';
-                                    echo '<td>';
+echo '<td><center>' . $row['Livro'] . '</center></td>';
+echo '<td><center>' . $row['DataDevolucao'] . '</center></td>';
+echo '<td><center><span class="' . $classeCSS . '">' . $estado . '</span></center></td>';
+echo '<td>';
 
-                                    // Lógica para exibir ações com base no estado
-                                    if ($row['Estado'] == 2 || $row['Estado'] == 4) {
-                                        echo '<div class="container">';
-                                        echo '<center>-</center>';
-                                        echo '</div>';
-                                    } else {
-                                        echo '<div class="container">';
-                                        echo '<center><button class="historico-button" type="submit" onclick="handlePopup(true)"><i class="fas fa-check"></i></button></center>';
-                                        echo '<div class="popup" id="popup">';
-                                        echo '<img src="../img/livro2.png">';
-                                        echo '<h2 class="title">Devolução</h2>';
-                                        echo '<p class="desc">O livro foi realmente devolvido?</p>';
-                                        echo '<button class="close-popup-button" type="submit" onclick="handlePopup(false)">Fechar</button>';
-                                        echo '<a id="devolucao-link" href="#">'; // Adicionando um link sem URL por enquanto
-                                        echo '<button class="close-popup-button">Devolver</button>';
-                                        echo '</a>';
-                                        echo '</div>';
-                                        echo '</div>';
-                                    }
+// Lógica para exibir ações com base no estado
+if ($row['Estado'] == 2 || $row['Estado'] == 4) {
+    echo '<div class="container">';
+    echo '<center>-</center>';
+    echo '</div>';
+} else {
+    echo '<div class="container">';
+    echo '<center><button class="historico-button" type="submit" onclick="handlePopup(true)"><i class="fas fa-check"></i></button></center>';
+    echo '<div class="popup" id="popup">';
+    echo '<img src="../img/livro2.png">';
+    echo '<h2 class="title">Devolução</h2>';
+    echo '<p class="desc">O livro foi realmente devolvido?</p>';
+    echo '<button class="close-popup-button" type="submit" onclick="handlePopup(false)">Fechar</button>';
+    echo '<a href="../Controller/CDevolver_livro.php?id=' . $row['idEmprestimo'] . '"><button class="close-popup-button">Devolver</button></a>';
+    echo '</div>';
+    echo '</div>';
+}
 
                                     echo '</td>';
                                     echo '</tr>';

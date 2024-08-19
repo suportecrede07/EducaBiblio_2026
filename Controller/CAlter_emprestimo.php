@@ -19,10 +19,15 @@ class CAlter_emprestimo
             $sql = "UPDATE emprestimo SET 
                         DataEmprestimo = :DataEmprestimo, 
                         StatusEmprestimo = :StatusEmprestimo, 
+                        DataEmprestimo = :DataEmprestimo, 
+                        StatusEmprestimo = :StatusEmprestimo, 
                         livro_idLivro = :livro_idLivro, 
                         usuario_idUsuario = :usuario_idUsuario, 
                         prof_idProf = :prof_idProf, 
+                        usuario_idUsuario = :usuario_idUsuario, 
+                        prof_idProf = :prof_idProf, 
                         aluno_idAluno = :aluno_idAluno, 
+                        Quantidade_emp = :Quantidade_emp 
                         Quantidade_emp = :Quantidade_emp 
                     WHERE idEmprestimo = :idEmprestimo";
 
@@ -33,7 +38,13 @@ class CAlter_emprestimo
             $stmt->bindParam(':DataEmprestimo', $DataEmprestimo);
             $stmt->bindParam(':StatusEmprestimo', $StatusEmprestimo);
             $stmt->bindParam(':livro_idLivro', $livro_idLivro);
+            $stmt->bindParam(':StatusEmprestimo', $StatusEmprestimo);
+            $stmt->bindParam(':livro_idLivro', $livro_idLivro);
             $stmt->bindParam(':usuario_idUsuario', $usuario_idUsuario);
+            // Verifica se os campos para professor e aluno estão vazios e atribui NULL
+            $stmt->bindValue(':prof_idProf', empty($prof_idProf) ? null : $prof_idProf);
+            $stmt->bindValue(':aluno_idAluno', empty($aluno_idAluno) ? null : $aluno_idAluno);
+            $stmt->bindParam(':Quantidade_emp', $Quantidade_emp);
             // Verifica se os campos para professor e aluno estão vazios e atribui NULL
             $stmt->bindValue(':prof_idProf', empty($prof_idProf) ? null : $prof_idProf);
             $stmt->bindValue(':aluno_idAluno', empty($aluno_idAluno) ? null : $aluno_idAluno);
@@ -56,4 +67,3 @@ class CAlter_emprestimo
         }
     }
 }
-?>

@@ -135,13 +135,11 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 						<style>
 
 						</style>
-						<input type="text" placeholder="Nome" name="NomeLivro" id="NomeLivro" class="box" autocomplete="off" required>
-						<input type="text" placeholder="Autor" name="NomeAutor" id="NomeAutor" class="box" autocomplete="off" required>
-						<input type="text" placeholder="Edição" name="EdicaoLivro" id="EdicaoLivro"  class="box" autocomplete="off">
-						<input type="text" placeholder="Editora" name="EditoraLivro" id="EditoraLivro"  class="box" autocomplete="off">
-						<input type="text" placeholder="Tombo" name="Tombo" id="Tombo" class="box" autocomplete="off">
-						<input type="text" placeholder="ISBN / CDD " name="IBSMLivro" id="IBSMLivro"  class="box" autocomplete="off">
-
+						<input type="text" placeholder="Nome" name="NomeLivro" id="NomeLivro" required maxlength="50" class="box" autocomplete="off" required>
+						<input type="text" placeholder="Autor" name="NomeAutor" id="NomeAutor" maxlength="50" class="box" autocomplete="off" required>
+						<input type="text" placeholder="Edição" name="EdicaoLivro" id="EdicaoLivro" maxlength="50" class="box" autocomplete="off">
+						<input type="text" placeholder="Editora" name="EditoraLivro" id="EditoraLivro" maxlength="50" class="box" autocomplete="off">
+						<input type="text" placeholder="ISBN/CDD" name="IBSMLivro" id="IBSMLivro" maxlength="50" class="box" autocomplete="off">
 
 						<select name="Genero_idGenero" id="Genero_idGenero" class="box select-dark-mode" required>
 							<option value="1">Autoajuda</option>
@@ -242,7 +240,7 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 							} else {
 								if ($result->rowCount() > 0) {
 									$livros = $result->fetchAll(PDO::FETCH_ASSOC);
-									$livrosPorPagina = 2000;
+									$livrosPorPagina = 3;
 									$paginaAtual = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
 									$indiceInicial = ($paginaAtual - 1) * $livrosPorPagina;
 									$livrosExibidos = array_slice($livros, $indiceInicial, $livrosPorPagina);
