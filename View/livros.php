@@ -139,7 +139,7 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 						<input type="text" placeholder="Autor" name="NomeAutor" id="NomeAutor" class="box" autocomplete="off" required>
 						<input type="text" placeholder="Edição" name="EdicaoLivro" id="EdicaoLivro"  class="box" autocomplete="off">
 						<input type="text" placeholder="Editora" name="EditoraLivro" id="EditoraLivro"  class="box" autocomplete="off">
-						<input type="text" placeholder="Tombo " name="Tombo" id="Tombo" class="box" autocomplete="off">
+						<input type="text" placeholder="Tombo" name="Tombo" id="Tombo" class="box" autocomplete="off">
 						<input type="text" placeholder="ISBN / CDD " name="IBSMLivro" id="IBSMLivro"  class="box" autocomplete="off">
 
 

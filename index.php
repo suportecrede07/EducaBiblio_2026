@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="CSS/transicao.css">
+    <link rel="stylesheet" href="CSS/style.css?v=<?= time() ?>">
     <link rel="shortcut icon" href="../img/icon1.png" type="image/x-icon">
     <title>EducaBiblio</title>
 </head>

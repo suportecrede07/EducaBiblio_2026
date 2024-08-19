@@ -3,7 +3,7 @@ var_dump($_POST);
 // Verifica se houve um envio de dados pelo método POST
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['Editar'])) {
     // Importe a classe responsável pela atualização do empréstimo
-    require_once('Controller/CAlter_emprestimo.php'); // Certifique-se do nome correto do arquivo
+    require_once('../Controller/CAlter_emprestimo.php'); // Certifique-se do nome correto do arquivo
 
     // Verifica se os campos necessários foram preenchidos
     if (
@@ -22,8 +22,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['Editar'])) {
         $livro_idLivro = $_POST['livro_idLivro'];
         $Turma_idTurma = $_POST['Turma_idTurma'];
         $DataEmprestimo = $_POST['DataEmprestimo'];
-        $quantidade = $_POST['quantidade'];
-        $data = $_POST['data'];
+        $Quantidade = $_POST['quantidade'];
+        $Data = $_POST['data'];
         $usuario_idUsuario = $_POST['usuario_idUsuario'];
 
         // Verifica se os campos para aluno e professor estão definidos e atribui seus valores
@@ -40,7 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['Editar'])) {
         }
 
         // Cria uma instância da classe para atualizar o empréstimo
-        $atualizacaoEmprestimo = new CAtualizarEmprestimo();
+        $atualizacaoEmprestimo = new CAlter_emprestimo();
 
         // Chama o método para atualizar o empréstimo
         $resultadoAtualizacao = $atualizacaoEmprestimo->atualizarEmprestimo(
@@ -57,22 +57,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['Editar'])) {
         );
 
         if ($resultadoAtualizacao) {
+            echo "Aluno atualizado com sucesso!";
             // Redirecione para alguma página de sucesso após a atualização
-            header("Location: ../view/emprestimos.php");
+            header("Location: ../View/emprestimos.php");
             exit();
         } else {
             // Se houver um erro na atualização, redirecione para uma página de erro ou faça alguma outra gestão
-            header("Location: ../view/emprestimos.php");
-            exit();
+            echo "Falha ao atualizar o aluno.";
         }
     } else {
         // Redirecione para alguma página de erro, pois parece que algum campo obrigatório não foi preenchido
-        header("Location: ../view/emprestimos.php");
-        exit();
+        echo "Por favor, preencha todos os campos necessários.";
+        header("Location: ../View/emprestimos.php");
     }
 } else {
     // Redirecione para alguma página de erro, pois parece que o envio do formulário não foi corretamente tratado
-    header("Location: ../view/emprestimos.php");
-    exit();
+    header("Location: ../View/emprestimos.php");
 }
 ?>

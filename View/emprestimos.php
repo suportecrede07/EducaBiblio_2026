@@ -135,7 +135,7 @@ $conn = $conexao->getConnection();
 					<form action="../Router/emp_rotas.php" method="post">
 						<h3>Empréstimo de livros</h3>
 						<input type="text" placeholder="ID" name="idEmprestimo" id="idEmprestimo" class="box2" autocomplete="off" readonly>
-						<select id="Genero_idGenero" name="Genero_idGenero" class="box select-dark-mode" required>
+						<select id="Genero_idGenero" name="Genero_idGenero" class="box select-dark-mode" value="genero" required onchange="javascript:associaInput();">
 							<option value="">Selecione um gênero</option>
 							<?php
 							// Preencha as opções de gênero a partir do banco de dados.
@@ -173,12 +173,10 @@ $conn = $conexao->getConnection();
 						<h4>Data do empréstimo:</h4>
 						<input type="date" placeholder="DD/MM/AAAA" name="DataEmprestimo" id="DataEmprestimo" required class="box" autocomplete="off" required>
 
-
-
 						<input type="text" placeholder="Quantidade" name="quantidade" required class="box" autocomplete="off" required>
 
 						<h4>Data da devolução:</h4>
-						<input type="date" placeholder="Data" name="data" required class="box" autocomplete="off" required>
+						<input type="date" placeholder="Data" name="data" id="DataDevolucao" required class="box" autocomplete="off" required>
 
 						<style>
 							h4 {
@@ -301,7 +299,7 @@ $conn = $conexao->getConnection();
 						} else {
 							if ($result->rowCount() > 0) {
 								$emprestimos = $result->fetchAll(PDO::FETCH_ASSOC);
-								$emprestimosPorPagina = 2000;
+								$emprestimosPorPagina = 50;
 								$paginaAtual = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
 								$indiceInicial = ($paginaAtual - 1) * $emprestimosPorPagina;
 								$emprestimosExibidos = array_slice($emprestimos, $indiceInicial, $emprestimosPorPagina);
@@ -342,13 +340,15 @@ $conn = $conexao->getConnection();
 									}
 
 									// Verifica se a data de empréstimo está definida antes de formatar
-									echo "<td><center>" . ($row["DataEmprestimo"] ? date('d/m/Y', strtotime($row["DataEmprestimo"])) : "Data não disponível") . "</center></td>";
+									echo "<td><center>" . ($row["DataEmprestimo"] ? date('d-m-Y', strtotime($row["DataEmprestimo"])) : "Data não disponível") . "</center></td>";
 
 									// Verifica se a data de devolução está definida antes de formatar
-									echo "<td><center>" . ($row["DataDevolucao"] ? date('d/m/Y', strtotime($row["DataDevolucao"])) : "Data não disponível") . "</center></td>";
+									echo "<td><center>" . ($row["DataDevolucao"] ? date('d-m-Y', strtotime($row["DataDevolucao"])) : "Data não disponível") . "</center></td>";
 
 									echo "<td><center>" . $row["Quantidade_emp"] . "</center></td>";
 									echo "<td><center>" . $row["UserUsuario"] . "</center></td>";
+
+									//Botão editar precisando de melhoras na lógica 
 									echo "<td><center><button class='edit-button'><i class='fas fa-pencil-alt'></i></button></center></td>";
 									echo "</tr>";
 								}
@@ -372,10 +372,6 @@ $conn = $conexao->getConnection();
 
 						$conn = null; // Fecha a conexão
 						?>
-
-
-
-
 
 
 					</div>
@@ -405,25 +401,28 @@ $conn = $conexao->getConnection();
 		$('.edit-button').click(function() {
 			// Obter o ID do empréstimo da linha correspondente na tabela
 			var idEmprestimo = $(this).closest('tr').find('td:eq(2)').text(); // ID do empréstimo na segunda coluna, ajuste conforme a estrutura real da sua tabela
-
+			var idEmprestimo = $(this).closest('tr').find('td:eq(2)').text();
+			
 			// Preencher o formulário com o ID do empréstimo
-			preencherFormulario(idEmprestimo); // Chama a função para preencher o formulário com o ID do empréstimo
+			preencherFormularioID(idEmprestimo);
+			  // Chama a função para preencher o formulário com o ID do empréstimo
 
 			// Alterar o modo de ação para editar
 			$('#modoAcao').val('editar');
 			// Alterar o valor do botão para refletir a ação de edição
 			$('input[type="submit"]').val('Editar');
 			// Modificar o action do formulário para o script responsável pela atualização
-			$('form').attr('action', '../router/Atualizar_emprotas.php');
+			$('form').attr('action', '../Router/Atualizar_emprotas.php');
 			// Modificar o texto do botão de envio para "Atualizar"
 			$('input[type="submit"]').attr('name', 'Editar');
 		});
 	});
 
 	// Função para preencher o formulário com o ID do empréstimo ao clicar no botão de edição
-	function preencherFormulario(idEmprestimo) {
+	function preencherFormularioID(idEmprestimo) {
 		$('#idEmprestimo').val(idEmprestimo);
 	}
+
 </script>
 
 <script>

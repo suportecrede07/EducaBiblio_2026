@@ -1,7 +1,7 @@
 // Função para redirecionar após a animação
 function redirect() {
     setTimeout(function() {
-        window.location.href = "View/login.php";
+        window.location.href = "../View/login.php";
     }, 1000); // Tempo de espera de 1 segundo após o término da animação
 }
 

@@ -2,7 +2,7 @@
 // Importe o arquivo que contém a classe de conexão
 require_once('CConexao.php'); // Substitua pelo arquivo correto
 
-class CAtualizarEmprestimo
+class CAlter_emprestimo
 {
     public function debugValues($idEmprestimo, $DataEmprestimo, $StatusEmprestimo, $livro_idLivro, $usuario_idUsuario, $prof_idProf, $aluno_idAluno, $Quantidade_emp) {
         var_dump($idEmprestimo, $DataEmprestimo, $StatusEmprestimo, $livro_idLivro, $usuario_idUsuario, $prof_idProf, $aluno_idAluno, $Quantidade_emp);
@@ -40,8 +40,6 @@ class CAtualizarEmprestimo
             $stmt->bindParam(':Quantidade_emp', $Quantidade_emp);
             $stmt->bindParam(':idEmprestimo', $idEmprestimo);
 
-            // Executar a função de debug para verificar os valores dos parâmetros
-            $this->debugValues($idEmprestimo, $DataEmprestimo, $StatusEmprestimo, $livro_idLivro, $usuario_idUsuario, $prof_idProf, $aluno_idAluno, $Quantidade_emp);
 
             // Execute a consulta
             $stmt->execute();

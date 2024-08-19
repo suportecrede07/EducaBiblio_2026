@@ -187,7 +187,7 @@ $conn = $conexao->getConnection();
                             $conn = $conexao->getConnection();
 
                             // Variáveis de paginação
-                            $livrosPorPagina = 15;
+                            $livrosPorPagina = 25;
                             $paginaAtual = isset($_GET['pagina']) ? $_GET['pagina'] : 1;
                             $inicio = ($paginaAtual - 1) * $livrosPorPagina;
 
@@ -206,7 +206,7 @@ $conn = $conexao->getConnection();
                     LEFT JOIN turma ta ON Turma_idTurma = ta.IdTurma
                     LEFT JOIN turma tp ON Turma_idTurma = tp.IdTurma
                     LEFT JOIN devolucao d ON e.idEmprestimo = d.emprestimo_idEmprestimo
-                    ORDER BY d.DataDevolucao desc";
+                    ORDER BY e.idEmprestimo desc";
 
                             // Executar a consulta para obter os empréstimos dos alunos e professores
                             $result = $conn->query($queryEmprestimos);
@@ -266,7 +266,7 @@ $conn = $conexao->getConnection();
                                     }
 
                                     echo '<td><center>' . $row['Livro'] . '</center></td>';
-                                    echo '<td><center>' . $row['DataDevolucao'] . '</center></td>';
+                                    echo '<td><center>' . ($row['DataDevolucao'] ? date('d-m-Y', strtotime($row["DataDevolucao"])) : "Data não disponível") .  '</center></td>';
                                     echo '<td><center><span class="' . $classeCSS . '">' . $estado . '</span></center></td>';
                                     echo '<td>';
 
@@ -284,9 +284,9 @@ $conn = $conexao->getConnection();
                                         echo '<p class="desc">O livro foi realmente devolvido?</p>';
                                         echo '<button class="close-popup-button" type="submit" onclick="handlePopup(false)">Fechar</button>';
                                         echo '<a id="devolucao-link" href="#">'; // Adicionando um link sem URL por enquanto
-echo '<button class="close-popup-button">Devolver</button>';
-echo '</a>';
-echo '</div>';
+                                        echo '<button class="close-popup-button">Devolver</button>';
+                                        echo '</a>';
+                                        echo '</div>';
                                         echo '</div>';
                                     }
 

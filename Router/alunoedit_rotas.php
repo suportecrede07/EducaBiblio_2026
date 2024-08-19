@@ -25,14 +25,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['Editar'])) {
 
         if ($resultado) {
             echo "Aluno atualizado com sucesso!";
-            header("Location: ../view/aluno.php"); // Redireciona para a página correta após a atualização do aluno
+            header("Location: ../View/aluno.php"); // Redireciona para a página correta após a atualização do aluno
             exit(); // Encerra o script após o redirecionamento
         } else {
             echo "Falha ao atualizar o aluno.";
         }
     } else {
         echo "Por favor, preencha todos os campos necessários.";
-        header("Location: ../view/aluno.php"); // Redireciona para a página correta após a atualização do aluno
+        header("Location: ../View/aluno.php"); // Redireciona para a página correta após a atualização do aluno
     }
 } else {
     echo "O envio do formulário não foi detectado.";

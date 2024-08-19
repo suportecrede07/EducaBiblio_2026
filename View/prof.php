@@ -200,7 +200,7 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 									echo "<th><center>ID</center></th>";
 									echo "<th><center>Nome</center></th>";
 									echo "<th><center>Email</center></th>";
-									echo "<th><center>Discicplina</center></th>";
+									echo "<th><center>Disciplina</center></th>";
 									echo "<th><center>Editar</center></th>";
 									echo "<th><center>Excluir</center></th>";
 									echo "<th><center>Histórico</center></th>";

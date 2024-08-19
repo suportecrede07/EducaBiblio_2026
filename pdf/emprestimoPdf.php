@@ -14,7 +14,7 @@ $sqlAlunos = "
         devolucao.DataDevolucao,
         emprestimo.Quantidade_emp,
         usuario.UserUsuario,
-        livro.Tombo
+        livro.idLivro
     FROM emprestimo
     LEFT JOIN aluno ON emprestimo.aluno_idAluno = aluno.idAluno
     INNER JOIN livro ON emprestimo.livro_idLivro = livro.idLivro
@@ -35,7 +35,7 @@ $sqlProfessores = "
         devolucao.DataDevolucao,
         emprestimo.Quantidade_emp,
         usuario.UserUsuario,
-        livro.Tombo
+        livro.idLivro
     FROM emprestimo
     LEFT JOIN prof ON emprestimo.prof_idProf = prof.idProf
     INNER JOIN livro ON emprestimo.livro_idLivro = livro.idLivro
@@ -161,4 +161,4 @@ $dompdf->setPaper('A4', 'landscape');
 
 $dompdf->render();
 
-$dompdf->stream("Tabela de empréstimo", array("Attachment" => false));
+$dompdf->stream("Tabela de empréstimos", array("Attachment" => false));

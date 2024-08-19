@@ -44,7 +44,7 @@ class CEmprestimoControllerProf
                     // Insira lógica para adicionar uma entrada de devolução pendente na tabela 'devolucao'
                     $emprestimoId = $conn->lastInsertId(); // Obtém o ID do empréstimo recém-inserido
 
-                    $dataDevolucao = date('Y-m-d', strtotime($dataEmprestimo . ' + 7 days')); // Define a data de devolução após 7 dias (por exemplo)
+                    $dataDevolucao = date('d/m/Y', strtotime($dataEmprestimo . ' + 7 days')); // Define a data de devolução após 7 dias (por exemplo)
 
                     $queryInsertDevolucao = "INSERT INTO devolucao (DataDevolucao, StatusDevolucao, emprestimo_idEmprestimo) VALUES (:dataDevolucao, 'Pendente', :emprestimoId)";
                     $stmtInsertDevolucao = $conn->prepare($queryInsertDevolucao);

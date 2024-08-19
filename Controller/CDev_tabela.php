@@ -13,7 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['aluno_idAluno'])) {
     $conn = $conexao->getConnection();
 
     // Consulta SQL para obter os dados do aluno e seus livros emprestados não devolvidos
-    $query = "SELECT 
+    $query = "SELECT
         aluno.NomeAluno AS Leitor,
         turma.NomeTurma AS Turma,
         livro.NomeLivro AS Livro,
