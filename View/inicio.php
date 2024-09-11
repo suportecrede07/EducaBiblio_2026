@@ -5,7 +5,7 @@ require '../Controller/CGet_rec.php';
 
 // Verificar se o usuário está logado
 if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true) {
-	header("Location: ../View/login.php"); // Redirecionar para a página de login se não estiver logado
+	header("Location: ../login.php"); // Redirecionar para a página de login se não estiver logado
 	exit();
 }
 
@@ -148,7 +148,7 @@ include('../Controller/CPendencias.php'); // Inclua o arquivo CPendencias.php aq
 							color: #32CD32;
 						}
 					</style>
-					<p>Seja bem-vindo ao EducaBiblio!</p>
+					<p>Seja bem-vindo(a) ao EducaBiblio!</p>
 				</div>
 			</div>
 
@@ -323,7 +323,6 @@ include('../Controller/CPendencias.php'); // Inclua o arquivo CPendencias.php aq
 				<div class="order">
 					<div class="head">
 						<h3>Histórico de empréstimos</h3>
-						<input type="text" id="searchInput" class="searchInput" placeholder="Pesquisar...">
 
 						<button class="pdf-button" id="pdf-button" aria-label="botão pdf" onclick="abrirAluno()">
 							<i class="fas fa-file-pdf"></i></button>
@@ -336,105 +335,47 @@ include('../Controller/CPendencias.php'); // Inclua o arquivo CPendencias.php aq
 						</script>
 
 					</div>
-					<table><?php
+					<table id="TableHistorico" class="table table-success" style="width:100%">
+								<thead>
+									<tr>
+										<th>Id</th>
+										<th>Livro</th>
+										<th>Nome</th>
+										<th>Data de empréstimo</th>
+										<th>Data de devolução</th>
+										<th>Estado</th>
+									</tr>
+								</thead>
+							</table>
 
-							$conexao = new CConexao();
-							$conn = $conexao->getConnection();
+							<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    						<script src="https://cdn.datatables.net/2.1.4/js/dataTables.js"></script>
 
-							// Definir o número de registros por página
-							$registrosPorPagina = 5;
-
-							// Determinar a página atual
-							$paginaAtual = isset($_GET['pagina']) ? $_GET['pagina'] : 1;
-							$indiceInicial = ($paginaAtual - 1) * $registrosPorPagina;
-
-							// Consulta para obter os dados de empréstimo paginados
-							$sql = "SELECT
-            emprestimo.idEmprestimo,
-            aluno.NomeAluno AS NomeAluno,
-            prof.NomeProf AS NomeProfessor,
-            DATE_FORMAT(emprestimo.DataEmprestimo, '%d/%m/%Y') AS DataEmprestimoFormatada,
-            IFNULL(DATE_FORMAT(devolucao.DataDevolucao, '%d/%m/%Y'), '--/--/----') AS DataDevolucaoFormatada,
-            IFNULL(DATE_FORMAT(devolucao.DataDevolvida, '%d/%m/%Y'), '--/--/----') AS DataDevolvidaFormatada,
-            CASE
-                WHEN emprestimo.StatusEmprestimo = 0 THEN 'A prazo'
-                WHEN emprestimo.StatusEmprestimo = 1 THEN 'Pendente'
-                WHEN emprestimo.StatusEmprestimo = 2 THEN 'Devolvido'
-                WHEN emprestimo.StatusEmprestimo = 4 THEN 'Devolução atrasada'
-                ELSE 'Status não definido'
-            END AS Estado
-        FROM emprestimo
-        LEFT JOIN aluno ON emprestimo.aluno_idAluno = aluno.idAluno
-        LEFT JOIN prof ON emprestimo.prof_idProf = prof.idProf
-        LEFT JOIN devolucao ON emprestimo.idEmprestimo = devolucao.emprestimo_idEmprestimo
-        LIMIT $indiceInicial, $registrosPorPagina";
-
-
-
-							$result = $conn->query($sql);
-
-							if ($result === false) {
-								// Use errorInfo para obter informações sobre o erro
-								$errorInfo = $conn->errorInfo();
-								echo "Erro na consulta SQL: " . $errorInfo[2];
-							} else {
-								if ($result->rowCount() > 0) {
-									$dadosEmprestimo = $result->fetchAll(PDO::FETCH_ASSOC);
-
-									// Exibir a tabela de empréstimos
-									echo "<table>";
-									echo "<thead>";
-									echo "<tr>";
-									echo "<th><center>Estudante</center></th>";
-									echo "<th><center>ID</center></th>";
-									echo "<th><center>Data do Empréstimo</center></th>";
-									echo "<th><center>Data de Devolução</center></th>";
-									echo "<th><center>Data em que foi Devolvido</center></th>";
-									echo "<th><center>Estado</center></th>";
-									echo "</tr>";
-									echo "</thead>";
-									echo "<tbody>";
-
-									foreach ($dadosEmprestimo as $emprestimo) {
-										echo "<tr>";
-										echo "<td><center>" . ($emprestimo['NomeAluno'] ?? $emprestimo['NomeProfessor']) . "</center></td>";
-										echo "<td><center>" . $emprestimo['idEmprestimo'] . "</center></td>";
-										echo "<td><center>" . $emprestimo['DataEmprestimoFormatada'] . "</center></td>";
-										echo "<td><center>" . $emprestimo['DataDevolucaoFormatada'] . "</center></td>";
-										echo "<td><center>" . $emprestimo['DataDevolvidaFormatada'] . "</center></td>";
-										echo "<td><center><span class='status ";
-										echo ($emprestimo['Estado'] === 'A prazo') ? 'process' : (($emprestimo['Estado'] === 'Pendente') ? 'pending' : 'completed');
-										echo "'>" . $emprestimo['Estado'] . "</span></center></td>";
-										echo "</tr>";
-									}
-
-
-
-									echo "</tbody>";
-									echo "</table>";
-
-									// Adiciona links de paginação
-									$sqlTotal = "SELECT COUNT(*) AS total FROM emprestimo";
-									$resultadoTotal = $conn->query($sqlTotal);
-									$totalRegistros = $resultadoTotal->fetch(PDO::FETCH_ASSOC)['total'];
-									$totalPaginas = ceil($totalRegistros / $registrosPorPagina);
-
-									echo "<div class='pagination'>";
-									for ($i = 1; $i <= $totalPaginas; $i++) {
-										$classeAtiva = ($i == $paginaAtual) ? "active" : "";
-										echo "<a class='page-link $classeAtiva' href='inicio.php?pagina=$i'>$i</a>";
-									}
-									echo "</div>";
-								} else {
-									echo "<p><center>Nenhum empréstimo encontrado.</center></p>";
-								}
-							}
-
-							$conn = null; // Fecha a conexão
-							?>
-
-					</table>
-				</div>
+							<script>
+    							new DataTable('#TableHistorico', {
+									ajax: {
+										"url": '../View/listarHistorico.php',
+										"dataType": 'JSON',
+										"error": function () {
+											alert('Não há registros para sua pesquisa');
+										}
+									},
+									processing: true,
+									serverSide: true,
+									language: {
+										url: "../lib/pt_br.json"
+									},
+									columnDefs: [{
+										"defaultContent": "-",
+										"targets": "_all",
+										"className": "dt-body-center"
+									}],
+									"lengthMenu": [[10, 15, 25, 50, 100, -1], [10, 15, 25, 50, 100, "Tudo"]],
+    							});
+    						</script>
+						</table>
+					
+					</div>
 
 			</div>
 			<footer class="footer">

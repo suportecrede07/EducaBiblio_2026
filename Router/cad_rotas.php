@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $nomeDoUsuario = obterNomeDoUsuario($conn, $username);
             $_SESSION['nomeDoUsuario'] = $nomeDoUsuario;
 
-            header("Location: ../View/inicio.php");
+            header("Location: ../inicio.php");
             exit();
         } else {
             // Credenciais incorretas, exiba uma mensagem de erro

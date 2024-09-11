@@ -132,10 +132,10 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 				<div class="row">
 					<form action="../Router/turma_rotas.php" method="post">
 						<h3>Cadastro de Turmas</h3>
-						<input type="number" placeholder="ID" name="IdTurma" id="IdTurma" class="box3" autocomplete="off" readonly>
-						<input type="Number" placeholder="Ano de início" name="AnodeInicio" id="AnodeInicio" class="box" autocomplete="off">
-						<input type="text" placeholder="Série" name="AnoTurma" id="AnoTurma"  class="box" autocomplete="off" required>
-						<input type="text" placeholder="Turma" name="NomeTurma" id="NomeTurma" class="box" autocomplete="off">
+						<input type="number" placeholder="ID" name="IdTurma" id="IdTurma" class="boxSecundario" autocomplete="off" readonly>
+						<input type="Number" placeholder="Ano de início" name="AnodeInicio" id="AnodeInicio" class="boxSecundario2" autocomplete="off">
+						<input type="text" placeholder="Série" name="AnoTurma" id="AnoTurma"  class="boxSecundario2" autocomplete="off" required>
+						<input type="text" placeholder="Turma" name="NomeTurma" id="NomeTurma" class="boxSecundario2" autocomplete="off">
 
 						<center><input type="submit" value="Enviar" class="inline-btn" name="action"></center>
 					</form>
@@ -170,7 +170,6 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 					<div class="order">
 						<div class="head">
 							<h3>Tabela de cadastro de turmas</h3>
-							<input type="text" id="searchInput" class="searchInput" placeholder="Pesquisar...">
 							<td>
 								<div class='container'>
 									<center>
@@ -363,82 +362,45 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 							</script>
 
 						</div>
-						<table>
-							<?php
-							$conexao = new CConexao();
-							$conn = $conexao->getConnection();
+						<table id="TableTurma" class="table table-success" style="width:100%">
+								<thead>
+									<tr>
+										<th>ID</th>
+										<th>Ano</th>
+										<th>Nome</th>
+										<th>Ano de Início</th>
+										<th>Excluir</th>
+									</tr>
+								</thead>
+							</table>
 
-							// Consulta para obter os dados da tabela de usuários
-							$sql = "SELECT
-					turma.AnodeInicio,
-					turma.AnoTurma,
-					turma.NomeTurma,
-					turma.IdTurma
-				FROM turma";
+							<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    						<script src="https://cdn.datatables.net/2.1.4/js/dataTables.js"></script>
 
-							$result = $conn->query($sql);
-
-							if ($result === false) {
-								// Use errorInfo para obter informações sobre o erro
-								$errorInfo = $conn->errorInfo();
-								echo "Erro na consulta SQL: " . $errorInfo[2];
-							} else {
-								if ($result->rowCount() > 0) {
-									$turm = $result->fetchAll(PDO::FETCH_ASSOC);
-									$TurmaPorPagina = 5;
-									$paginaAtual = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
-									$indiceInicial = ($paginaAtual - 1) * $TurmaPorPagina;
-									$TurmasExibidos = array_slice($turm, $indiceInicial, $TurmaPorPagina);
-
-									// Exibir a tabela de usuários
-									echo "<table>";
-									echo "<thead>";
-									echo "<tr>";
-									echo "<th class='sortable' data-column='id'><center>ID</center></th>";
-									echo "<th class='sortable' data-column='serie'><center>Série</center></th>";
-									echo "<th class='sortable' data-column='turma'><center>Turma</center></th>";
-									echo "<th class='sortable' data-column='ano'><center>Ano</center></th>";
-									echo "<th><center>Editar</center></th>";
-									echo "<th><center>Excluir</center></th>";
-									echo "</tr>";
-									echo "</thead>";
-									echo "<tbody>";
-
-									foreach ($TurmasExibidos as $row) {
-										echo "<tr>";
-										echo "<td><center>" . $row["IdTurma"] . "</center></td>";
-										echo "<td><center>" . $row["AnoTurma"] . "</center></td>";
-										echo "<td><center>" . $row["NomeTurma"] . "</center></td>";
-										echo "<td><center>" . $row["AnodeInicio"] . "</center></td>";
-										echo "<td><center><button class='edit-button' data-id='$row[IdTurma]'><i class='fas fa-pencil-alt'></i></button></center></td>";
-										echo "<td><div class='container'><center><button class='delete-button' type='button' onclick='handlePopup(true)' aria-label='botão excluir'><i class='fas fa-trash-alt'></i></button></center><div class='popup' id='popup'><img src='../img/decisao.png' aria-label='popup decisão'><h2 class='title'>Aviso!</h2><p class='desc'>Deseja mesmo excluir?</p><button class='close-popup-button' type='button' onclick='handlePopup(false)'>Fechar</button><a href='../Controller/CExcluir_turma.php?id={$row["IdTurma"]}'><button class='close-popup-button'>Excluir</button></a></div></div></div></td>";
-										echo "</tr>";
-									}
-
-									echo "</tbody>";
-									echo "</table>";
-
-									// Adiciona links de paginação
-									echo "<div class='pagination'>";
-									$totalturm = count($turm);
-									$totalPaginas = ceil($totalturm / $TurmaPorPagina);
-									for ($i = 1; $i <= $totalPaginas; $i++) {
-										$classeAtiva = ($i === $paginaAtual) ? "active" : "";
-										echo "<a class='page-link $classeAtiva' href='turma.php?pagina=$i'>$i</a>";
-									}
-									echo "</div>";
-
-									// Botão Fechar do popup fora da tabela
-
-								} else {
-									echo "<p><center>Nenhuma turma encontrada.</center></p>";
-								}
-							}
-
-							$conn = null; // Fecha a conexão
-							?>
-							</tbody>
+							<script>
+    							new DataTable('#TableTurma', {
+									ajax: {
+										"url": '../View/listarTurma.php',
+										"dataType": 'JSON',
+										"error": function () {
+											alert('Não há registros para sua pesquisa');
+										}
+									},
+									processing: true,
+									serverSide: true,
+									language: {
+										url: "../lib/pt_br.json"
+									},
+									columnDefs: [{
+										"defaultContent": "-",
+										"targets": "_all",
+										"className": "dt-body-center"
+									}],
+									"lengthMenu": [[10, 15, 25, 50, 100, -1], [10, 15, 25, 50, 100, "Tudo"]],
+    							});
+    						</script>
 						</table>
+						
 					</div>
 
 				</div>

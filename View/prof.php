@@ -133,10 +133,10 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 				<div class="row">
 					<form action="../Router/prof_rotas.php" method="post">
 						<h3>Cadastro de Professores</h3>
-						<input type="text" placeholder="ID" name="idProf" id="idProf" class="box3" autocomplete= "off" readonly>
-						<input type="text" placeholder="Nome" name="NomeProf" id="NomeProf" class="box" autocomplete="off">
-						<input type="email" placeholder="E-mail" name="EmailProf" id="EmailProf" class="box" autocomplete="off">
-						<input type="text" placeholder="Disciplina" name="MateriaProf" id="MateriaProf"  class="box" autocomplete="off">
+						<input type="text" placeholder="ID" name="idProf" id="idProf" class="boxSecundario" autocomplete= "off" readonly>
+						<input type="text" placeholder="Nome" name="NomeProf" id="NomeProf" class="boxSecundario2" autocomplete="off">
+						<input type="email" placeholder="E-mail" name="EmailProf" id="EmailProf" class="boxSecundario2" autocomplete="off">
+						<input type="text" placeholder="Disciplina" name="MateriaProf" id="MateriaProf"  class="boxSecundario2" autocomplete="off">
 						<center><input type="submit" value="Enviar" class="inline-btn" name="action"></center>
 					</form>
 				</div>
@@ -159,7 +159,6 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 					<div class="order">
 						<div class="head">
 							<h3>Tabela de cadastro de professores</h3>
-							<input type="text" id="searchInput" class="searchInput" placeholder="Pesquisar...">
 
 							<button class="pdf-button" id="pdf-button" aria-label="botão pdf" onclick="abrirAluno2()">
 								<i class="fas fa-file-pdf"></i></button>
@@ -171,80 +170,45 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 								window.open(urlDoPDF, '_blank');
 							}
 						</script>
-						<table>
+						<table id="TableProf" class="table table-success" style="width:100%">
+								<thead>
+									<tr>
+										<th>ID</th>
+										<th>Nome</th>
+										<th>Email</th>
+										<th>Disciplina</th>
+										<th>Excluir</th>
+									</tr>
+								</thead>
+							</table>
 
-							<?php
+							<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    						<script src="https://cdn.datatables.net/2.1.4/js/dataTables.js"></script>
 
-							// Aqui você já deve ter sua conexão com o banco de dados configurada
-
-							// Consulta SQL para obter os dados dos professores
-							$sql = "SELECT * FROM prof";
-							$result = $conn->query($sql);
-
-							if ($result === false) {
-								// Use errorInfo para obter informações sobre o erro
-								$errorInfo = $conn->errorInfo();
-								echo "Erro na consulta SQL: " . $errorInfo[2];
-							} else {
-								if ($result->rowCount() > 0) {
-									$user = $result->fetchAll(PDO::FETCH_ASSOC);
-									$UsuarioPorPagina = 5;
-									$paginaAtual = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
-									$indiceInicial = ($paginaAtual - 1) * $UsuarioPorPagina;
-									$UsuarioExibidos = array_slice($user, $indiceInicial, $UsuarioPorPagina);
-
-									// Exibir a tabela com os dados dos professores
-									echo "<table>";
-									echo "<thead>";
-									echo "<tr>";
-									echo "<th><center>ID</center></th>";
-									echo "<th><center>Nome</center></th>";
-									echo "<th><center>Email</center></th>";
-									echo "<th><center>Disciplina</center></th>";
-									echo "<th><center>Editar</center></th>";
-									echo "<th><center>Excluir</center></th>";
-									echo "<th><center>Histórico</center></th>";
-									echo "</tr>";
-									echo "</thead>";
-									echo "<tbody>";
-
-									foreach ($UsuarioExibidos as $row) {
-										echo "<tr>";
-										echo "<td><center>" . $row["idProf"] . "</center></td>";
-										echo "<td><center>" . $row["NomeProf"] . "</center></td>";
-										echo "<td><center>" . $row["EmailProf"] . "</center></td>";
-										echo "<td><center>" . $row["MateriaProf"] . "</center></td>";
-										echo "<td><center><button class='edit-button' data-id='" . $row["idProf"] . "'><i class='fas fa-pencil-alt'></i></button></center> 	</td>";
-										echo "<td><center><div class='container'><center><button class='delete-button' type='button' onclick='handlePopup(true)' aria-label='botão excluir'><i class='fas fa-trash-alt'></i></button></center><div class='popup' id='popup'><img src='../img/decisao.png' aria-label='popup decisão'><h2 class='title'>Aviso!</h2><p class='desc'>Deseja mesmo excluir?</p><button class='close-popup-button' type='button' onclick='handlePopup(false)'>Fechar</button><a href='../Controller/CExcluir_prof.php?id={$row["idProf"]}'><button class='close-popup-button'>Excluir</button></a></div></div></div></center></td>";
-										echo "<td><center><a href='../pdf/registrosProfPdf.php?idProf=" . $row["idProf"] . "' target='_blank'><button class='historico-button' data-id='" . $row["idProf"] . "'><i class='fas fa-history'></i></button></a></center></td>";
-
-										echo "</tr>";
-									}
-
-									echo "</tbody>";
-									echo "</table>";
-
-									// Adiciona links de paginação
-									echo "<div class='pagination'>";
-									$totalUser = count($user);
-									$totalPaginas = ceil($totalUser / $UsuarioPorPagina);
-									for ($i = 1; $i <= $totalPaginas; $i++) {
-										$classeAtiva = ($i === $paginaAtual) ? "active" : "";
-										echo "<a class='page-link $classeAtiva' href='prof.php?pagina=$i'>$i</a>";
-									}
-									echo "</div>";
-
-									// Botão Fechar do popup fora da tabela
-								}
-							}
-
-							$conn = null; // Fecha a conexão
-							?>
-
-
-
-							</tbody>
+							<script>
+    							new DataTable('#TableProf', {
+									ajax: {
+										"url": '../View/listarProf.php',
+										"dataType": 'JSON',
+										"error": function () {
+											alert('Não há registros para sua pesquisa');
+										}
+									},
+									processing: true,
+									serverSide: true,
+									language: {
+										url: "../lib/pt_br.json"
+									},
+									columnDefs: [{
+										"defaultContent": "-",
+										"targets": "_all",
+										"className": "dt-body-center"
+									}],
+									"lengthMenu": [[10, 15, 25, 50, 100, -1], [10, 15, 25, 50, 100, "Tudo"]],
+    							});
+    						</script>
 						</table>
+						
 					</div>
 				</div>
 				<footer class="footer">

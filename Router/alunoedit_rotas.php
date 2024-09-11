@@ -37,4 +37,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['Editar'])) {
 } else {
     echo "O envio do formulário não foi detectado.";
 }
-?>

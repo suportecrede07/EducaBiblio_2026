@@ -1,6 +1,7 @@
 <?php
 // Inclua o arquivo de conexão ao banco de dados.
 include '../Controller/CConexao.php';
+include '../Controller/CPendencias.php';
 
 // Verificar se o usuário está logado
 if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true) {
@@ -27,6 +28,7 @@ $conn = $conexao->getConnection();
     <link rel="stylesheet" href="../CSS/style.css">
     <link rel="stylesheet" href="../CSS/popup3.css">
     <link rel="stylesheet" href="../CSS/darkPaginacao.css">
+    <link rel="stylesheet" href="../lib/bootstrap/bootstrap.min.css">
     <title>EducaBiblio</title>
 </head>
 
@@ -135,25 +137,6 @@ $conn = $conexao->getConnection();
             <section class="tabela">
 
                 <div class="row">
-                    <form action="../Router/dev_rotas.php" method="post">
-                        <h3>Busca por empréstimos</h3>
-                        <select id="Turma_idTurma" name="Turma_idTurma" class="box select-dark-mode" required>
-                            <option value="">Selecione uma turma</option>
-                            <?php
-                            // Preencha as opções de turma a partir do banco de dados.
-                            $query = "SELECT IdTurma, AnodeInicio, AnoTurma, NomeTurma FROM turma";
-                            $stmt = $conn->query($query);
-                            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                echo "<option value='" . $row['IdTurma'] . "'>" . $row['AnoTurma'] . 'º ' . $row['NomeTurma'] . "</option>";
-                            }
-                            ?>
-                        </select>
-                        <select id="aluno_idAluno" name="aluno_idAluno" class="box select-dark-mode">
-                            <option value="">Selecione um aluno</option>
-                            <!-- Opções de alunos serão preenchidas dinamicamente com JavaScript -->
-                        </select>
-
-                    </form>
                 </div>
             </section>
             <main>
@@ -161,7 +144,6 @@ $conn = $conexao->getConnection();
                     <div class="order">
                         <div class="head">
                             <h3>Tabela de devolução de livros</h3>
-                            <input type="text" id="searchInput" class="searchInput" placeholder="Pesquisar...">
                             <button class="pdf-button" id="pdf-button" aria-label="botão pdf" onclick="abrirAluno()">
                                 <i class="fas fa-file-pdf"></i></button>
 
@@ -173,161 +155,52 @@ $conn = $conexao->getConnection();
                             </script>
 
                         </div>
-                        <table>
+                        <table id="TableDev" class="table" style="width:100%">
+								<thead>
+									<tr>
+										<th>ID</th>
+										<th>Leitor</th>
+                                        <th>Ano</th>
+										<th>Turma</th>
+										<th>Livro</th>
+										<th>Data para devolução</th>
+                                        <th>Data devolvido</th>
+										<th>Estado</th>
+										<th>Devolvido</th>
+									</tr>
+								</thead>
+							</table>
 
-                            <?php
-                            // Verificar se o usuário está logado
-                            if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true) {
-                                header("Location: ../View/login.php"); // Redirecionar para a página de login se não estiver logado
-                                exit();
-                            }
+							<script src="../lib/jquery/jquery-3.7.1.min.js"></script>
+    						<script src="../lib/datatables/dataTables.js"></script>
+                            <script src="../lib/bootstrap/bootstrap.bundle.min.js"></script>  
+                            <script src="../JS/estados.js"></script>  
+                            
 
-                            // Inicialize a instância da classe de conexão.
-                            $conexao = new CConexao();
-                            $conn = $conexao->getConnection();
-
-// Variáveis de paginação
-$livrosPorPagina = 3;
-$paginaAtual = isset($_GET['pagina']) ? $_GET['pagina'] : 1;
-$inicio = ($paginaAtual - 1) * $livrosPorPagina;
-
-                            // Consulta SQL para recuperar empréstimos de alunos e professores
-                            $queryEmprestimos = "SELECT e.idEmprestimo, 
-                            COALESCE(a.NomeAluno, p.Nomeprof) AS Leitor, 
-                            COALESCE(a.idAluno, p.idprof) AS idLeitor,
-                            COALESCE(ta.NomeTurma, tp.NomeTurma) AS Turma, 
-                            l.NomeLivro AS Livro, 
-                            e.StatusEmprestimo AS Estado,
-                            d.DataDevolucao
-                    FROM emprestimo e
-                    LEFT JOIN aluno a ON e.aluno_idAluno = a.idAluno
-                    LEFT JOIN prof p ON e.prof_idprof = p.idprof
-                    LEFT JOIN livro l ON e.livro_idLivro = l.idLivro
-                    LEFT JOIN turma ta ON Turma_idTurma = ta.IdTurma
-                    LEFT JOIN turma tp ON Turma_idTurma = tp.IdTurma
-                    LEFT JOIN devolucao d ON e.idEmprestimo = d.emprestimo_idEmprestimo
-                    ORDER BY e.idEmprestimo desc";
-
-                            // Executar a consulta para obter os empréstimos dos alunos e professores
-                            $result = $conn->query($queryEmprestimos);
-
-                            if ($result->rowCount() > 0) {
-                                echo '<table>';
-                                echo '<thead>';
-                                echo '<tr>';
-                                echo '<th><center>ID</center></th>';
-                                echo '<th><center>Leitor</center></th>';
-                                echo '<th><center>Turma</center></th>';
-                                echo '<th><center>Livro</center></th>';
-                                echo '<th><center>Data de Devolução</center></th>';
-                                echo '<th><center>Estado</center></th>';
-                                echo '<th><center>Ações</center></th>';
-                                echo '</tr>';
-                                echo '</thead>';
-                                echo '<tbody>';
-
-                                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                                    $estado = "";
-                                    $classeCSS = "";
-
-                                    // Lógica para definir o estado e a classe CSS
-                                    switch ($row['Estado']) {
-                                        case 0:
-                                            $estado = "A prazo";
-                                            $classeCSS = "status process";
-                                            break;
-                                        case 1:
-                                            $estado = "Pendente";
-                                            $classeCSS = "status pending";
-                                            break;
-                                        case 2:
-                                            $estado = "Devolvido";
-                                            $classeCSS = "status completed";
-                                            break;
-                                        case 4:
-                                            $estado = "Devolvido com pendência";
-                                            $classeCSS = "status process";
-                                            break;
-                                        default:
-                                            $estado = "Estado desconhecido";
-                                            $classeCSS = "status unknown";
-                                            break;
-                                    }
-
-        echo '<tr>';
-echo '<td><center>' . $row['idLeitor'] . '</center></td>';
-echo '<td><center>' . $row['Leitor'] . '</center></td>';
-
-                                    // Verifica se o campo de Turma está vazio e se o campo Nomeprof não está vazio para exibir o nome do professor
-                                    if (empty($row['Turma']) && !empty($row['Nomeprof'])) {
-                                        echo '<td><center>' . $row['Nomeprof'] . '</center></td>';
-                                    } else {
-                                        echo '<td><center>' . $row['Turma'] . '</center></td>';
-                                    }
-
-echo '<td><center>' . $row['Livro'] . '</center></td>';
-echo '<td><center>' . $row['DataDevolucao'] . '</center></td>';
-echo '<td><center><span class="' . $classeCSS . '">' . $estado . '</span></center></td>';
-echo '<td>';
-
-// Lógica para exibir ações com base no estado
-if ($row['Estado'] == 2 || $row['Estado'] == 4) {
-    echo '<div class="container">';
-    echo '<center>-</center>';
-    echo '</div>';
-} else {
-    echo '<div class="container">';
-    echo '<center><button class="historico-button" type="submit" onclick="handlePopup(true)"><i class="fas fa-check"></i></button></center>';
-    echo '<div class="popup" id="popup">';
-    echo '<img src="../img/livro2.png">';
-    echo '<h2 class="title">Devolução</h2>';
-    echo '<p class="desc">O livro foi realmente devolvido?</p>';
-    echo '<button class="close-popup-button" type="submit" onclick="handlePopup(false)">Fechar</button>';
-    echo '<a href="../Controller/CDevolver_livro.php?id=' . $row['idEmprestimo'] . '"><button class="close-popup-button">Devolver</button></a>';
-    echo '</div>';
-    echo '</div>';
-}
-
-                                    echo '</td>';
-                                    echo '</tr>';
-                                }
-
-                                echo '</tbody>';
-                                echo '</table>';
-
-                                // Consulta SQL para contar o número total de registros
-                                $queryCount = "SELECT COUNT(*) AS total FROM emprestimo e
-                   LEFT JOIN aluno a ON e.aluno_idAluno = a.idAluno
-                   LEFT JOIN prof p ON e.prof_idprof = p.idprof
-                   LEFT JOIN livro l ON e.livro_idLivro = l.idLivro
-                   LEFT JOIN turma ta ON Turma_idTurma = ta.IdTurma
-                   LEFT JOIN turma tp ON Turma_idTurma = tp.IdTurma
-                   LEFT JOIN devolucao d ON e.idEmprestimo = d.emprestimo_idEmprestimo";
-
-                                // Executar a consulta para contar o total de registros
-                                $resultCount = $conn->query($queryCount);
-                                $totalRegistros = $resultCount->fetch(PDO::FETCH_ASSOC)['total'];
-
-                                // Calcular o número total de páginas
-                                $totalPaginas = ceil($totalRegistros / $livrosPorPagina);
-
-                                // Exibir os links de paginação
-                                echo "<div class='pagination'>";
-                                for ($i = 1; $i <= $totalPaginas; $i++) {
-                                    $classeAtiva = ($i == $paginaAtual) ? "active" : "";
-                                    echo "<a class='page-link $classeAtiva' href='devolucao.php?pagina=$i'>$i</a>";
-                                }
-                                echo "</div>";
-                            } else {
-                                echo "<p><center>Nenhum empréstimo encontrado.</center></p>";
-                            }
-                            ?>
-
-
-
-
-
-                        </table>
+							<script>
+    							new DataTable('#TableDev', {
+									ajax: {
+										"url": '../View/listarDevolucao.php',
+										"dataType": 'JSON',
+										"error": function () {
+											alert('Não há registros para sua pesquisa');
+										}
+									},
+									processing: true,
+									serverSide: true,
+									language: {
+										url: "../lib/pt_br.json"
+									},
+									columnDefs: [{
+										"defaultContent": "-",
+										"targets": "_all",
+										"className": "dt-body-center"
+									}],
+									"lengthMenu": [[10, 15, 25, 50, 100, -1], [10, 15, 25, 50, 100, "Tudo"]],
+    							});
+    						</script>
+						</table>
+                        
                     </div>
 
                 </div>
@@ -345,18 +218,7 @@ if ($row['Estado'] == 2 || $row['Estado'] == 4) {
 <script src="../JS/popup.js"></script>
 <script scr="../ArquivosExternos/ajax.js"></script>
 <script src="../ArquivosExternos/jquery.js"></script>
-
-<script>
-    $('#searchInput').on('keyup', function() {
-        const value = $(this).val().toLowerCase();
-
-        $('table tbody tr').filter(function() {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-        });
-    });
 </script>
-
-
 
 <script>
     $('#aluno_idAluno').on('change', function() {
@@ -397,79 +259,8 @@ if ($row['Estado'] == 2 || $row['Estado'] == 4) {
                 alunoSelect.html("<option value=''>Selecione um aluno</option>");
             }
         });
-
-        $(".search-button").click(function(e) {
-            e.preventDefault();
-            var alunoId = $("#aluno_idAluno").val();
-
-            if (alunoId !== "") {
-                $.ajax({
-                    url: '../Controller/CDev_tabela.php',
-                    type: 'POST',
-                    dataType: 'json',
-                    data: {
-                        aluno_idAluno: alunoId
-                    },
-                    success: function(response) {
-                        $('#tabela-dados tbody').empty();
-
-                        $.each(response, function(index, row) {
-                            var newRow = '<tr>' +
-                                '<td><center>' + row.Leitor + '</center></td>' +
-                                '<td><center>' + row.Turma + '</center></td>' +
-                                '<td><center>' + row.Livro + '</center></td>' +
-                                '<td><center><span class="status pending">' + row.Estado + '</span></center></td>' +
-                                '<td>' +
-                                '<div class="container">' +
-                                '<center>' +
-                                '<button class="historico-button" type="submit" onclick="handlePopup(true)">' +
-                                '<i class="fas fa-check"></i>' +
-                                '</button>' +
-                                '</center>' +
-                                '<div class="popup" id="popup">' +
-                                '<img src="../img/livro2.png">' +
-                                '<h2 class="title">Devolução</h2>' +
-                                '<p class="desc">O livro foi realmente devolvido?</p>' +
-                                '<button class="close-popup-button" type="submit" onclick="handlePopup(false)">' +
-                                'ㅤ Fechar ㅤ' +
-                                '</button>' +
-                                '<button class="close-popup-button">' +
-                                'Devolver' +
-                                '</button>' +
-                                '</div>' +
-                                '</div>' +
-                                '</td>' +
-                                '</tr>';
-
-                            $('#tabela-dados tbody').append(newRow);
-                        });
-                    },
-                    error: function() {
-                        alert('Erro ao buscar dados do servidor.');
-                    }
-                });
-            }
-        });
     });
 </script>
-<script>
-$(document).ready(function() {
-    // Capturar clique no botão de devolução
-    $('.historico-button').click(function() {
-        // Obter o ID do item a ser devolvido
-        var id = $(this).closest('tr').find('td:eq(0)').text(); // Considerando que o ID está na segunda coluna
-
-        // Mostrar o popup de confirmação
-        handlePopup(true);
-
-        // Preencher o link de devolução com o ID correto
-        var linkDevolucao = '../Controller/CDevolver_livro.php?id=' + id;
-        $('#devolucao-link').attr('href', linkDevolucao);
-    });
-});
-</script>
-
-
 </body>
 
 </html>

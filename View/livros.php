@@ -19,6 +19,7 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 	<link rel="stylesheet" href="../CSS/style.css">
 	<link rel="stylesheet" href="../CSS/popup2.css">
 	<link rel="stylesheet" href="../CSS/darkPaginacao.css">
+	<link rel="stylesheet" href="../lib/datatables/dataTables.css">
 
 	<title>EducaBiblio</title>
 </head>
@@ -153,17 +154,19 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 							<option value="9">Outro</option>
 							<option value="10">Quadrinhos</option>
 							<option value="11">Crônica</option>
+							<option value="12">Didático</option>
 						</select>
 						<select name="Idioma_idIdioma" id="Idioma_idIdioma" class="box select-dark-mode">
 							<option value="1">Português</option>
 							<option value="2">Inglês</option>
 							<option value="3">Espanhol</option>
 						</select>
-
+						<!-- Excluindo campo não necessário - João Victor
 						<select name="DidaticoLivro" id="DidaticoLivro" class="box select-dark-mode">
 						<option value="Não">Material não didático</option>
 							<option value="Sim">Material didático</option>
 						</select>
+						-->
 						<input type="text" placeholder="Localização" name="LocalLivro" id="LocalLivro" class="box" autocomplete="off">
 
 
@@ -190,7 +193,6 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 					<div class="order">
 						<div class="head">
 							<h3>Tabela de cadastro livros</h3>
-							<input type="text" id="searchInput" class="searchInput" placeholder="Pesquisar...">
 
 							<button class="pdf-button" id="pdf-button" aria-label="botão pdf" onclick="abrirAluno()">
 								<i class="fas fa-file-pdf"></i></button>
@@ -203,139 +205,49 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 							</script>
 
 						</div>
-						<table>
-							<?php
-							$conexao = new CConexao();
-							$conn = $conexao->getConnection();
+						<table id="TableLivros" class="table table-success" style="width:100%">
+								<thead>
+									<tr>
+										<th>ID</th>
+										<th>Nome</th>
+										<th>Editora</th>
+										<th>Tombo</th>
+										<th>IBSM/CDD</th>
+										<th>Quantidade</th>
+										<th>Gênero</th>
+										<th>Idioma</th>
+										<th>Autor</th>
+										<th>Excluir</th>
+									</tr>
+								</thead>
+							</table>
 
-							// Consulta para obter os dados da tabela de livros
-							$sql = "SELECT
-            livro.idLivro,
-            livro.NomeLivro,
-            livro.EditoraLivro,
-            livro.Tombo,
-            livro.IBSMLivro,
-			livro.QuantidadeLivros,
-            genero.NomeGenero AS GeneroLivro,
-            idioma.Idioma AS IdiomaLivro,
-            livro.LocalLivro,
-            livro.PrateleiraLivro,
-            livro.ColunaLivro,
-            autor.NomeAutor
-        FROM
-            livro
-        LEFT JOIN
-            genero ON livro.Genero_idGenero = genero.idGenero
-        LEFT JOIN
-            autor ON livro.Autor_idAutor = autor.idAutor
-        LEFT JOIN
-            idioma ON livro.Idioma_idIdioma = idioma.idIdioma";
+							<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    						<script src="https://cdn.datatables.net/2.1.4/js/dataTables.js"></script>
+							
 
-							$result = $conn->query($sql);
-
-							if ($result === false) {
-								// Use errorInfo para obter informações sobre o erro
-								$errorInfo = $conn->errorInfo();
-								echo "Erro na consulta SQL: " . $errorInfo[2];
-							} else {
-								if ($result->rowCount() > 0) {
-									$livros = $result->fetchAll(PDO::FETCH_ASSOC);
-									$livrosPorPagina = 3;
-									$paginaAtual = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
-									$indiceInicial = ($paginaAtual - 1) * $livrosPorPagina;
-									$livrosExibidos = array_slice($livros, $indiceInicial, $livrosPorPagina);
-
-									echo "<table>";
-									echo "<thead>";
-									echo "<tr>";
-									echo "<th><center>Nome</center></th>";
-									echo "<th><center>ID</center></th>";
-									echo "<th><center>Editora</center></th>";
-									echo "<th><center>Tombo</center></th>";
-									echo "<th><center>ISBN / CDD</center></th>";
-									echo "<th><center>Gênero</center></th>";
-									echo "<th><center>Idioma</center></th>";
-									echo "<th><center>Quantidade</center></th>";
-									echo "<th><center>Localização</center></th>";
-									echo "<th><center>Editar</center></th>";
-									echo "<th><center>Excluir</center></th>";
-									echo "</tr>";
-									echo "</thead>";
-									echo "<tbody>";
-
-									foreach ($livrosExibidos as $row) {
-										echo "<tr>";
-										echo "<td><center>" . $row["NomeLivro"] . "</center></td>";
-										echo "<td><center>" . $row["idLivro"] . "</center></td>";
-										echo "<td><center>" . $row["EditoraLivro"] . "</center></td>";
-										echo "<td><center>" . $row["Tombo"] . "</center></td>";
-										echo "<td><center>" . $row["IBSMLivro"] . "</center></td>";
-										echo "<td><center>" . $row["GeneroLivro"] . "</center></td>";
-										echo "<td><center>" . $row["IdiomaLivro"] . "</center></td>";
-										echo "<td><center>" . $row["QuantidadeLivros"] . "</center></td>";
-										echo "<td><div class='container'><center><button class='historico-button' type='button' onclick='handlePopup1(\"" . $row["LocalLivro"] . "\", \"" . $row["PrateleiraLivro"] . "\", \"" . $row["ColunaLivro"] . "\")'><i class='fas fa-map-marker-alt'></i></button></center><div class='popup1' id='popup1'><img src='../img/livro.png'><h2 class='title'>Localização</h2><p class='desc'><b>✧ Localização: </b></p><p class='desc'></p><p class='desc'></p><button class='close-popup1-button' type='button' onclick='handlePopup1(false)'>Fechar</button></div></div></div></td>";
-
-										echo "<td><center><button class='edit-button'><i class='fas fa-pencil-alt'></i></button></center></td>";
-										echo "<td><div class='container'><center><button class='delete-button' type='button' onclick='handlePopup(true)' aria-label='botão excluir'><i class='fas fa-trash-alt'></i></button></center><div class='popup' id='popup'><img src='../img/decisao.png' aria-label='popup decisão'><h2 class='title'>Aviso!</h2><p class='desc'>Deseja mesmo excluir?</p><button class='close-popup-button' type='button' onclick='handlePopup(false)'>Fechar</button><a href='../Controller/CExcluir_livros.php?id={$row["idLivro"]}'><button class='close-popup-button'>Excluir</button></a></div></div></div></td>";
-										echo "</tr>";
-									}
-
-
-
-									
-
-
-									echo "</tbody>";
-									echo "</table>";
-
-									// Adiciona links de paginação
-									echo "<div class='pagination'>";
-									$totalLivros = count($livros);
-									$totalPaginas = ceil($totalLivros / $livrosPorPagina);
-
-									if ($totalPaginas > 4) {
-										// Se houver mais de 4 páginas, exibe de forma mais seletiva
-										if ($paginaAtual <= 2) {
-											for ($i = 1; $i <= 3; $i++) {
-												$classeAtiva = ($i === $paginaAtual) ? "active" : "";
-												echo "<a class='page-link $classeAtiva' href='livros.php?pagina=$i'>$i</a>";
-											}
-											echo "<span>ₒₒₒ</span>";
-											echo "<a class='page-link' href='livros.php?pagina=$totalPaginas'>$totalPaginas</a>";
-										} elseif ($paginaAtual >= $totalPaginas - 1) {
-											echo "<a class='page-link' href='livros.php?pagina=1'>1</a>";
-											echo "<span>ₒₒₒ</span>";
-											for ($i = $totalPaginas - 2; $i <= $totalPaginas; $i++) {
-												$classeAtiva = ($i === $paginaAtual) ? "active" : "";
-												echo "<a class='page-link $classeAtiva' href='livros.php?pagina=$i'>$i</a>";
-											}
-										} else {
-											echo "<a class='page-link' href='livros.php?pagina=1'>1</a>";
-											echo "<span>ₒₒₒ</span>";
-											for ($i = $paginaAtual - 1; $i <= $paginaAtual + 1; $i++) {
-												$classeAtiva = ($i === $paginaAtual) ? "active" : "";
-												echo "<a class='page-link $classeAtiva' href='livros.php?pagina=$i'>$i</a>";
-											}
-											echo "<span>ₒₒₒ</span>";
-											echo "<a class='page-link' href='livros.php?pagina=$totalPaginas'>$totalPaginas</a>";
+							<script>
+    							new DataTable('#TableLivros', {	
+									ajax: {
+										"url": '../View/listarLivros.php',
+										"dataType": 'JSON',
+										"error": function () {
+											alert('Não há registros para sua pesquisa');
 										}
-									} else {
-										// Caso contrário, exibe normalmente
-										for ($i = 1; $i <= $totalPaginas; $i++) {
-											$classeAtiva = ($i === $paginaAtual) ? "active" : "";
-											echo "<a class='page-link $classeAtiva' href='livros.php?pagina=$i'>$i</a>";
-										}
-									}
-
-									echo "</div>";
-								} else {
-									echo "<tr><td colspan='8'><center>Nenhum livro encontrado.</center></td></tr>";
-								}
-							}
-
-							$conn = null; // Fecha a conexão
-
-							?>
+									},
+									processing: true,
+									serverSide: true,
+									language: {
+										url: "../lib/pt_br.json"
+									},
+									columnDefs: [{
+										"defaultContent": "-",
+										"targets": "_all",
+										"className": "d-flex justify-content-center"
+									}],
+									"lengthMenu": [[10, 15, 25, 50, 100, -1], [10, 15, 25, 50, 100, "Tudo"]],
+    							});
+    						</script>
 						</table>
 					</div>
 
@@ -450,5 +362,4 @@ function preencherFormulario(idLivro, NomeLivro, EditoraLivro, Tombo, IBSMLivro,
 </script>
 
 </body>
-
 </html>

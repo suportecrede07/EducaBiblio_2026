@@ -34,11 +34,11 @@ if (isset($_GET['id'])) {
         // Verifica se a exclusão do livro foi bem-sucedida
         if ($stmtDeleteLivro->rowCount() > 0) {
             // Redireciona de volta para a página de livros após a exclusão
-            header("Location: ../view/livros.php");
+            header("Location: ../View/livros.php");
             exit();
         } else {
             // Se não houve exclusão, redireciona com mensagem de falha
-            header("Location: ../view/livros.php?error=Falha ao excluir o livro.");
+            header("Location: ../View/livros.php?error=Falha ao excluir o livro.");
             exit();
         }
     } catch (PDOException $e) {

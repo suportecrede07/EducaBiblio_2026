@@ -30,15 +30,16 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
         // Verificar se o livro já foi devolvido
         if ($statusEmprestimo == 0 || $statusEmprestimo == 1) {
             // Atualizar o StatusEmprestimo para 2 (devolvido) ou 4 (devolvido com pendência)
-            $newStatus = ($statusEmprestimo == 0) ? 2 : 4;
+            $newStatus = ($statusEmprestimo == 1) : 2;
 
-            // Atualizar o StatusEmprestimo na tabela emprestimo
-            $sqlUpdateStatus = "UPDATE emprestimo SET StatusEmprestimo = :newStatus WHERE idEmprestimo = :id";
-            $stmt = $conn->prepare($sqlUpdateStatus);
-            $stmt->bindParam(':newStatus', $newStatus, PDO::PARAM_INT);
-            $stmt->bindParam(':id', $idEmprestimo, PDO::PARAM_INT);
-            $stmt->execute();
+            
         }
+        // Atualizar o StatusEmprestimo na tabela emprestimo
+        $sqlUpdateStatus = "UPDATE emprestimo SET StatusEmprestimo = :newStatus WHERE idEmprestimo = :id";
+        $stmt = $conn->prepare($sqlUpdateStatus);
+        $stmt->bindParam(':newStatus', $newStatus, PDO::PARAM_INT);
+        $stmt->bindParam(':id', $idEmprestimo, PDO::PARAM_INT);
+        $stmt->execute();
 
         // Verificar se já existe uma devolução para esse empréstimo na tabela devolucao
         $sqlCheckDevolucao = "SELECT * FROM devolucao WHERE emprestimo_idEmprestimo = :id";

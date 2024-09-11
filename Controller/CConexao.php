@@ -24,6 +24,15 @@ class CConexao
 
     public function getConnection()
     {
-        return $this->conn;
+        if ($this->conn) {
+            return $this->conn;
+        } else {
+            throw new Exception("Conexão com o banco de dados não estabelecida");
+        }
+    }
+
+    public function closeConnection()
+    {
+        $this->conn = null;
     }
 }
