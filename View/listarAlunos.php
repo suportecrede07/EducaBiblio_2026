@@ -56,7 +56,8 @@
         $registro[] = $AnoTurma;
         $registro[] = $nomeTurma;
         $registro[] = $EmailAluno;
-        $registro[] = "<a href='../Controller/CExcluir_aluno.php?id={$row_al["idAluno"]}'><button class='close-popup-button'><i class='fas fa-trash'></i></button></a>";
+        $registro[] = "<button type='button' class='btn btn-outline-warning' id='$idAluno' onclick='editAluno($idAluno)'><i class='fas fa-pen'></i></button>";
+        $registro[] = " <button type='button' class='btn btn-outline-danger' id='$idAluno' onclick='excluirAluno($idAluno)'><i class='fas fa-trash-alt'></i></button>";
 
         $dados[] = $registro;
     }

@@ -22,13 +22,11 @@
     COALESCE(ta.NomeTurma, tp.NomeTurma) AS Turma, 
     ta.AnoTurma AS Ano,
     l.NomeLivro AS Livro, 
+    l.Tombo as Tombo,
     DATE_FORMAT(e.DataEmprestimo, '%d/%m/%Y') AS DataEmprestimoFormatada,
     IFNULL(DATE_FORMAT(d.DataDevolucao, '%d/%m/%Y'), '--/--/----') AS DataDevolucaoFormatada,
     IFNULL(DATE_FORMAT(d.DataDevolvida, '%d/%m/%Y'), '--/--/----') AS DataDevolvidaFormatada,
-    CASE
-        WHEN e.StatusEmprestimo = 1 THEN 'Ativo'
-        WHEN e.StatusEmprestimo = 2 THEN 'Devolvido'
-    END AS Estado
+    e.StatusEmprestimo as Estado
     FROM emprestimo e
     LEFT JOIN aluno a ON e.aluno_idAluno = a.idAluno
     LEFT JOIN prof p ON e.prof_idprof = p.idprof
@@ -43,6 +41,7 @@
         $sqlAlunos .= " OR a.NomeAluno like :leitor ";
         $sqlAlunos .= " OR p.Nomeprof like :leitor2 ";
         $sqlAlunos .= " OR e.StatusEmprestimo like :estado ";
+        $sqlAlunos .= " OR l.Tombo like :Tombo ";
     }
 
     $sqlAlunos .= " ORDER BY ID desc LIMIT :inicio , :quantidade";
@@ -59,24 +58,46 @@
         $result_Emprestimos->bindParam(':leitor', $valor_pesq, PDO::PARAM_STR);
         $result_Emprestimos->bindParam(':leitor2', $valor_pesq, PDO::PARAM_STR);
         $result_Emprestimos->bindParam(':estado', $valor_pesq, PDO::PARAM_STR);
+        $result_Emprestimos->bindParam(':Tombo', $valor_pesq, PDO::PARAM_STR);
     }
 
     $result_Emprestimos->execute();
 
     while($row_Emp = $result_Emprestimos->fetch(PDO::FETCH_ASSOC)) {
+        $estado = "";
+        $classeCSS = "";
+
+        // Lógica para definir o estado e a classe CSS
+        switch ($row_Emp['Estado']) {
+            case 1:
+                $estado = "Ativo";
+                $classeCSS = "status process";
+                break;
+            case 3:
+                $estado = "Pendente";
+                $classeCSS = "status pending";
+                break;
+            case 2:
+                $estado = "Devolvido";
+                $classeCSS = "status completed";
+                break;
+        }
+
         //var_dump($row_Emp);
         extract($row_Emp);
         $registro = [];
         $registro[] = $ID;
+        $registro[] = $Tombo;
         $registro[] = $Leitor;
         $registro[] = $Ano;
         $registro[] = $Turma;
         $registro[] = $Livro;
         $registro[] = $DataDevolucaoFormatada;
         $registro[] = $DataDevolvidaFormatada;
-        $registro[] = $Estado;
-        $registro[] = "<a href='../Controller/CDevolver_livro.php?id={$row_Emp["ID"]}'><button class='close-popup-button'><i class='fa fa-check-square'></i></button></a>";
+        $registro[] = "<span class='$classeCSS'> $estado </span>";
+        $registro[] = "<button class='btn btn-outline-primary' onclick='devolver($ID)' id='$ID'><i class='fa fa-check' aria-hidden='true'></i></button>";
 
+        
         $dados[] = $registro;
     }
     //var_dump($dados);

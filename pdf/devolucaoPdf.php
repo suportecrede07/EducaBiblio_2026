@@ -7,13 +7,13 @@ FROM emprestimo
 INNER JOIN aluno ON emprestimo.aluno_idAluno = aluno.idAluno
 INNER JOIN livro ON emprestimo.livro_idLivro = livro.idLivro
 INNER JOIN turma ON aluno.Turma_idTurma = turma.IdTurma
-LEFT JOIN devolucao ON emprestimo.idEmprestimo = devolucao.emprestimo_idEmprestimo";
+LEFT JOIN devolucao ON emprestimo.idEmprestimo = devolucao.emprestimo_idEmprestimo WHERE emprestimo.StatusEmprestimo = 3";
 
 $sqlProfessores = "SELECT emprestimo.idEmprestimo, prof.NomeProf AS Professor, 'Professor' AS Turma, livro.NomeLivro AS Livro, emprestimo.StatusEmprestimo AS Estado, devolucao.DataDevolucao
 FROM emprestimo
 INNER JOIN prof ON emprestimo.prof_idProf = prof.idProf
 INNER JOIN livro ON emprestimo.livro_idLivro = livro.idLivro
-LEFT JOIN devolucao ON emprestimo.idEmprestimo = devolucao.emprestimo_idEmprestimo";
+LEFT JOIN devolucao ON emprestimo.idEmprestimo = devolucao.emprestimo_idEmprestimo WHERE emprestimo.StatusEmprestimo = 3";
 
 
 
@@ -78,7 +78,7 @@ if ($res->num_rows > 0) {
     </head>
     <body>
         <div id='library-info'>
-            <h1>Tabela de Devolução</h1>
+            <h1>Tabela de Pendências</h1>
             <p>
                 Bem-vindo ao EducaBiblio, o seu sistema de biblioteca dedicado à promoção da educação e leitura! Abaixo, apresentamos os registros de devoluções realizadas.
             </p>
@@ -89,7 +89,7 @@ if ($res->num_rows > 0) {
                 <th>Livro</th>
                 <th>Leitor</th>
                 <th>Turma</th>
-                <th>Data de Devolução</th>
+                <th>Data para Devolução</th>
                 </tr>
             </thead>
             <tbody>";

@@ -724,8 +724,6 @@ p {
 }
 
 #content main .table-data {
-    display: flex;
-    flex-wrap: wrap;
     grid-gap: 24px;
     margin-top: 24px;
     width: 100%;
@@ -742,19 +740,20 @@ p {
 }
 
 #content main .table-data .head {
-    display: flex;
     align-items: center;
     grid-gap: 16px;
     margin-bottom: 24px;
 }
 
 #content main .table-data .head h3 {
+    margin-top: 1%;
+    margin-bottom: 1%;
     margin-right: 4.5%;
     margin-left: auto;
     font-size: 2rem;
     font-family: "Mulish", sans-serif;
     font-weight: bolder;
-    margin-top: -15px;
+    margin-top: 0.5rem;
 }
 
 #content main .table-data .head .fas {
@@ -955,6 +954,7 @@ p {
 }
 
 .footer {
+    border-radius: 10px;
     background-color: var(--light);
     border: var(--bordinha);
     bottom: 0;
@@ -981,6 +981,16 @@ p {
 }
 
 .box {
+    flex: 1;
+    margin: 10px;
+    border: 1px solid #ccc;
+    transition: border-color 0.3s, background-color 0.3s;
+    padding: 10px;
+    max-width: calc(50% - 20px);
+    color: var(--cinzaEscuro);
+}
+
+.boxEmp{
     flex: 1;
     margin: 10px;
     border: 1px solid #ccc;
@@ -1068,6 +1078,7 @@ p {
 }
 
 /* Alterações CSS - João Victor */
+
 
 .tabela .row form .box {
     width: 30%;

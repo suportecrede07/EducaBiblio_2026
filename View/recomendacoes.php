@@ -17,6 +17,7 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 	<script src="../ArquivosExternos/icons.js"></script>
 	<link rel="shortcut icon" href="../img/icon1.png" type="image/x-icon">
 	<link rel="stylesheet" href="../CSS/style.css">
+	<link rel="stylesheet" href="../lib/Bootstrap 2/bootstrap.min.css">
 
 	<title>EducaBiblio</title>
 </head>
@@ -184,7 +185,7 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 				<div class="table-data">
 					<div class="order">
 						<div class="head">
-							<h3><br>Tabela de recomendações<br> <br></h3>
+							<h3><br>Tabela de Recomendações<br> <br></h3>
 						</div>
 						<table>
 

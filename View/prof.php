@@ -19,6 +19,8 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 	<script src="../ArquivosExternos/icons.js"></script>
 	<link rel="shortcut icon" href="../img/icon1.png" type="image/x-icon">
 	<link rel="stylesheet" href="../CSS/style.css">
+	<link rel="stylesheet" href="../lib/Bootstrap 2/bootstrap.min.css">
+	<link rel="stylesheet" href="../lib/datatables/dataTables.dataTables.min.css">
 	<link rel="stylesheet" href="../CSS/popup6.css">
 	<link rel="stylesheet" href="../CSS/darkPaginacao.css">
 	<script src="../JS/alunos_prof.js"></script>
@@ -106,13 +108,6 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 			<div class="icons">
 				<div id="menu-btn" class="fas fa-question" onclick="abrirPDFEmNovaAba()"></div>
 			</div>
-
-			<script>
-				function abrirPDFEmNovaAba() {
-					var urlDoPDF = "../ArquivosExternos/Manual.pdf";
-					window.open(urlDoPDF, '_blank');
-				}
-			</script>
 			<input type="checkbox" id="switch-mode" hidden>
 			<label for="switch-mode" class="switch-mode"></label>
 			<a href="#" class="profile">
@@ -158,10 +153,7 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 				<div class="table-data">
 					<div class="order">
 						<div class="head">
-							<h3>Tabela de cadastro de professores</h3>
-
-							<button class="pdf-button" id="pdf-button" aria-label="botão pdf" onclick="abrirAluno2()">
-								<i class="fas fa-file-pdf"></i></button>
+							<h3>Tabela de Cadastro de Professores</h3>
 
 						</div>
 						<script>
@@ -170,47 +162,59 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 								window.open(urlDoPDF, '_blank');
 							}
 						</script>
-						<table id="TableProf" class="table table-success" style="width:100%">
+						<span id="msgAlerta"></span>
+						<table id="TableProf" style="width:100%">
 								<thead>
 									<tr>
 										<th>ID</th>
 										<th>Nome</th>
 										<th>Email</th>
 										<th>Disciplina</th>
+										<th>Editar</th>
 										<th>Excluir</th>
 									</tr>
 								</thead>
 							</table>
 
-							<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-    						<script src="https://cdn.datatables.net/2.1.4/js/dataTables.js"></script>
-
-							<script>
-    							new DataTable('#TableProf', {
-									ajax: {
-										"url": '../View/listarProf.php',
-										"dataType": 'JSON',
-										"error": function () {
-											alert('Não há registros para sua pesquisa');
-										}
-									},
-									processing: true,
-									serverSide: true,
-									language: {
-										url: "../lib/pt_br.json"
-									},
-									columnDefs: [{
-										"defaultContent": "-",
-										"targets": "_all",
-										"className": "dt-body-center"
-									}],
-									"lengthMenu": [[10, 15, 25, 50, 100, -1], [10, 15, 25, 50, 100, "Tudo"]],
-    							});
-    						</script>
 						</table>
 						
 					</div>
 				</div>
+
+				<!-- Criando Modal Editar -->
+				<div class="modal fade" id="editProfModal" tabindex="-1" arial-labelledby="editProfModalLabel" arial-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="editProfModalLabel">Editar Professores</h5>
+							</div>
+							<div class="modal-body">
+								<span id="msgAlertErroEdit"></span>
+								<form method="POST" id="form-edit-prof" action="../Modais/editarProf.php">
+									<div class="mb-3">
+										<input type="text" class="form-control" name="idProf" id="editIdProf" required autocomplete="off" readonly>
+									</div>
+									<div class="mb-3">
+										<label for="form-control">Nome do Professor:</label>
+										<input type="text" class="form-control" name="NomeProf" id="editNomeProf" required autocomplete="off" >
+									</div>
+									<div class="mb-3">
+										<label for="form-control"> Email: </label>
+										<input type="text" class="form-control" name="EmailProf" id="editEmailProf"  autocomplete="off" >
+									</div>	
+									<div class="mb-3">
+										<label for="form-control"> Disciplina: </label>
+										<input type="text" class="form-control" name="MateriaProf" id="editMateriaProf" required autocomplete="off" >
+									</div>
+									
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+								<button type="submit" class="btn btn-warning" form="form-edit-prof" value="Salvar">Salvar Alterações</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
 				<footer class="footer">
 					© Copyright 2023 por <span>EducaBiblio</span> | Todos os direitos reservados
 				</footer>
@@ -229,8 +233,65 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 </html>
 
 <script src="../JS/script.js"></script>
-<script src="../JS/popup.js"></script>
-<script src="../ArquivosExternos/Ajax.js"></script>
+<script src="../lib/jquery/jquery-3.7.1.min.js"></script>
+<script src="../lib/datatables/dataTables.js"></script>
+<script src="../lib/Bootstrap 2/bootstrap.bundle.min.js"></script>
+
+<!-- Função do Modal Editar -->
+<script>
+	const editModal = new bootstrap.Modal(document.getElementById('editProfModal'));
+	async function editProf(idProf) {
+		//console.log(idEmprestimo);
+		const dados = await fetch('../Modais/visualizarProf.php?idProf=' + idProf);
+		const resposta = await dados.json();
+		//console.log(resposta);
+
+		if(resposta['status']){
+			document.getElementById("msgAlerta").innerHTML = "";
+			editModal.show();
+
+			document.getElementById("editIdProf").value = resposta['dados'].idProf;
+			document.getElementById("editNomeProf").value = resposta['dados'].NomeProf;
+			document.getElementById("editEmailProf").value = resposta['dados'].EmailProf;
+			document.getElementById("editMateriaProf").value = resposta['dados'].MateriaProf;
+		}else{
+			alert(resposta['msg']);
+		}
+	}
+</script>
+
+<!-- Salvando informações no banco de dados -->
+<script>
+	const formEditProf = document.getElementById("form-edit-prof");
+	if(formEditProf){
+		formEditProf.addEventListener("submit", async(e) => {
+			e.preventDefault();
+			const dadosForm = new FormData(formEditProf);
+
+			const dados = await fetch("../Modais/editarProf.php", {
+				method: "POST",
+				body: dadosForm
+			});
+
+			const resposta = await dados.json();
+
+			if (resposta['status']){
+				//document.getElementById("msgAlertErroEdit").innerHTML = resposta['msg'];
+
+				document.getElementById("msgAlerta").innerHTML = resposta['msg'];
+				document.getElementById("msgAlertErroEdit").innerHTML = "";
+				formEditProf.reset();	
+				editModal.hide();
+				listarDataTables = $('#TableProf').DataTable();
+				listarDataTables.draw();
+			}else{
+				document.getElementById("msgAlertErroEdit").innerHTML = resposta['msg'];
+			}
+
+		});
+	}
+</script>
+
 <script>
 	$(document).ready(function() {
 		$('#turmaTable').DataTable(); // Inicializa o DataTables para a tabela de turma
@@ -295,9 +356,46 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 	}
 </script>
 
+<script>
+	async function excluirProf(idProf) {
 
+		const dados = await fetch("../Controller/CExcluir_prof.php?id=" + idProf);
+		var confirmar = confirm("Você realmente quer apagar o registro selecionado?");
 
+		//console.log(resposta);
+		if(confirmar){
+			document.getElementById("msgAlerta").innerHTML = "<div class='alert alert-success' role='alert'>Registro apagado com sucesso!</div>";
 
+			listarDataTables = $('#TableProf').DataTable();
+			listarDataTables.draw();
+		}else{
+			document.getElementById("msgAlerta").innerHTML = "<div class='alert alert-danger' role='alert'> Erro: Registro não apagado</div>";
+		}
+	}
+</script>
+
+<script>
+	new DataTable('#TableProf', {
+		ajax: {
+			"url": '../View/listarProf.php',
+			"dataType": 'JSON',
+			"error": function () {
+				alert('Não há registros para sua pesquisa');
+			}
+		},
+		processing: true,
+		serverSide: true,
+		language: {
+			url: "../lib/pt_br.json"
+		},
+		columnDefs: [{
+			"defaultContent": "-",
+			"targets": "_all",
+			"className": "dt-body-center"
+		}],
+		"lengthMenu": [[10, 15, 25, 50, 100, -1], [10, 15, 25, 50, 100, "Tudo"]],
+	});
+</script>
 
 </body>
 

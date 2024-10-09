@@ -30,7 +30,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
         // Verificar se o livro já foi devolvido
         if ($statusEmprestimo == 0 || $statusEmprestimo == 1) {
             // Atualizar o StatusEmprestimo para 2 (devolvido) ou 4 (devolvido com pendência)
-            $newStatus = ($statusEmprestimo == 1) : 2;
+            $newStatus = 2;
 
             
         }

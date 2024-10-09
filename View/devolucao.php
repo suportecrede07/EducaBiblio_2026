@@ -26,9 +26,11 @@ $conn = $conexao->getConnection();
     <script src="../ArquivosExternos/icons.js"></script>
     <link rel="shortcut icon" href="../img/icon1.png" type="image/x-icon">
     <link rel="stylesheet" href="../CSS/style.css">
+    <link rel="stylesheet" href="../lib/Bootstrap 2/bootstrap.min.css">
+	<link rel="stylesheet" href="../lib/datatables/dataTables.dataTables.min.css">
     <link rel="stylesheet" href="../CSS/popup3.css">
     <link rel="stylesheet" href="../CSS/darkPaginacao.css">
-    <link rel="stylesheet" href="../lib/bootstrap/bootstrap.min.css">
+
     <title>EducaBiblio</title>
 </head>
 
@@ -143,7 +145,7 @@ $conn = $conexao->getConnection();
                 <div class="table-data">
                     <div class="order">
                         <div class="head">
-                            <h3>Tabela de devolução de livros</h3>
+                            <h3>Tabela de Devolução de Livros</h3>
                             <button class="pdf-button" id="pdf-button" aria-label="botão pdf" onclick="abrirAluno()">
                                 <i class="fas fa-file-pdf"></i></button>
 
@@ -155,10 +157,12 @@ $conn = $conexao->getConnection();
                             </script>
 
                         </div>
-                        <table id="TableDev" class="table" style="width:100%">
+                        <span id="msgAlerta"></span>
+                        <table id="TableDev" style="width:100%">
 								<thead>
 									<tr>
 										<th>ID</th>
+                                        <th>Tombo</th>
 										<th>Leitor</th>
                                         <th>Ano</th>
 										<th>Turma</th>
@@ -171,34 +175,6 @@ $conn = $conexao->getConnection();
 								</thead>
 							</table>
 
-							<script src="../lib/jquery/jquery-3.7.1.min.js"></script>
-    						<script src="../lib/datatables/dataTables.js"></script>
-                            <script src="../lib/bootstrap/bootstrap.bundle.min.js"></script>  
-                            <script src="../JS/estados.js"></script>  
-                            
-
-							<script>
-    							new DataTable('#TableDev', {
-									ajax: {
-										"url": '../View/listarDevolucao.php',
-										"dataType": 'JSON',
-										"error": function () {
-											alert('Não há registros para sua pesquisa');
-										}
-									},
-									processing: true,
-									serverSide: true,
-									language: {
-										url: "../lib/pt_br.json"
-									},
-									columnDefs: [{
-										"defaultContent": "-",
-										"targets": "_all",
-										"className": "dt-body-center"
-									}],
-									"lengthMenu": [[10, 15, 25, 50, 100, -1], [10, 15, 25, 50, 100, "Tudo"]],
-    							});
-    						</script>
 						</table>
                         
                     </div>
@@ -215,10 +191,10 @@ $conn = $conexao->getConnection();
 </html>
 
 <script src="../JS/script.js"></script>
-<script src="../JS/popup.js"></script>
 <script scr="../ArquivosExternos/ajax.js"></script>
-<script src="../ArquivosExternos/jquery.js"></script>
-</script>
+<script src="../lib/jquery/jquery-3.7.1.min.js"></script>
+<script src="../lib/datatables/dataTables.js"></script>
+<script src="../lib/bootstrap/bootstrap.bundle.min.js"></script>
 
 <script>
     $('#aluno_idAluno').on('change', function() {
@@ -259,6 +235,47 @@ $conn = $conexao->getConnection();
                 alunoSelect.html("<option value=''>Selecione um aluno</option>");
             }
         });
+    });
+</script>
+<script>
+	async function devolver(ID) {
+		//console.log(idLivro);
+
+		const dados = await fetch("../Controller/CDevolver_livro.php?id=" + ID);
+		var confirmar = confirm("O livro foi realmente devolvido?");
+
+		//console.log(resposta);
+		if(confirmar){
+			document.getElementById("msgAlerta").innerHTML = "<div class='alert alert-success' role='alert'>O livro foi devolvido com sucesso!</div>";
+
+			listarDataTables = $('#TableDev').DataTable();
+			listarDataTables.draw();
+		}else{
+			document.getElementById("msgAlerta").innerHTML = "<div class='alert alert-danger' role='alert'> Erro: O livro não foi devolvido!</div>";
+		}
+	}
+</script>
+
+<script>
+    new DataTable('#TableDev', {
+        ajax: {
+            "url": '../View/listarDevolucao.php',
+            "dataType": 'JSON',
+            "error": function () {
+                alert('Não há registros para sua pesquisa');
+            }
+        },
+        processing: true,
+        serverSide: true,
+        language: {
+            url: "../lib/pt_br.json"
+        },
+        columnDefs: [{
+            "defaultContent": "-",
+            "targets": "_all",
+            "className": "dt-body-center"
+        }],
+        "lengthMenu": [[10, 15, 25, 50, 100, -1], [10, 15, 25, 50, 100, "Tudo"]],
     });
 </script>
 </body>

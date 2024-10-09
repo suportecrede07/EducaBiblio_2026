@@ -45,7 +45,8 @@
         $registro[] = $NomeProf;
         $registro[] = $EmailProf;
         $registro[] = $MateriaProf;
-        $registro[] = "<a href='../Controller/CExcluir_prof.php?id={$row_prof["idProf"]}'><button class='close-popup-button'><i class='fa fa-trash'></i></button></a>";
+        $registro[] = "<button type='button' class='btn btn-outline-warning' id='$idProf' onclick='editProf($idProf)'><i class='fas fa-pen'></i></button>";
+        $registro[] = "<button type='button' class='btn btn-outline-danger' id='$idProf' onclick='excluirProf($idProf)'><i class='fas fa-trash-alt'></i></button>";
 
         $dados[] = $registro;
     }

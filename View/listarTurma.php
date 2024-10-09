@@ -44,7 +44,8 @@
         $registro[] = $AnoTurma;
         $registro[] = $NomeTurma;
         $registro[] = $AnodeInicio;
-        $registro[] = "<a href='../Controller/CExcluir_turma.php?id={$row_turma["idTurma"]}'><button class='close-popup-button'><i class='fa fa-trash'></i></button></a>";
+        $registro[] = "<button type='button' class='btn btn-outline-warning' id='$idTurma' onclick='editTurma($idTurma)'><i class='fas fa-pen'></i></button>";
+        $registro[] = " <button type='button' class='btn btn-outline-danger' id='$idTurma' onclick='excluirTurma($idTurma)'><i class='fas fa-trash-alt'></i></button>";
 
         $dados[] = $registro;
     }

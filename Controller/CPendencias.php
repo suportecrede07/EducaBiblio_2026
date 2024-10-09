@@ -29,9 +29,11 @@ try {
                 $dataDevolvido = $row['Devolvido'];
                 
 
-                if (empty($dataDevolvido)) {
+                if (empty($dataDevolvido)&&($dataAtualUsuario > $dataDevolucao)) {
+                    $sqlUpdate = "UPDATE emprestimo SET StatusEmprestimo = 3 WHERE idEmprestimo = :idEmprestimo";
+                } elseif(empty($dataDevolvido)){
                     $sqlUpdate = "UPDATE emprestimo SET StatusEmprestimo = 1 WHERE idEmprestimo = :idEmprestimo";
-                } else {
+                }else {
                     $sqlUpdate = "UPDATE emprestimo SET StatusEmprestimo = 2 WHERE idEmprestimo = :idEmprestimo";
                 }
 

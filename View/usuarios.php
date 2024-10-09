@@ -18,6 +18,7 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 	<link rel="shortcut icon" href="../img/icon1.png" type="image/x-icon">
 	<link rel="stylesheet" href="../CSS/style.css">
 	<link rel="stylesheet" href="../CSS/popup.css">
+	<link rel="stylesheet" href="../lib/Bootstrap 2/bootstrap.min.css">
 	<link rel="stylesheet" href="../CSS/darkPaginacao.css">
 
 	<title>EducaBiblio</title>
@@ -134,7 +135,7 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 
 				<div class="row">
 					<form action="../Router/cad_rotas" method="post" enctype="multipart/form-data">
-						<h3>Cadastro de usuários</h3>
+						<h3>Cadastro de Usuários</h3>
 						<input type="text" placeholder="ID" name="idUsuario" id="idUsuario" class="box3" autocomplete="off">
 						<input type="text" placeholder="Nome" name="NomeUsuario" id="NomeUsuario" required class="box" autocomplete="off" required>
 						<input type="text" placeholder="Usuário" name="UserUsuario" id="UserUsuario" required  class="box" autocomplete="off" required>
@@ -175,7 +176,7 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 				<div class="table-data">
 					<div class="order">
 						<div class="head">
-							<h3>Tabela de cadastro de usuários</h3>
+							<h3>Tabela de Cadastro de Usuários</h3>
 							<input type="text" id="searchInput" class="searchInput" placeholder="Pesquisar...">
 							<button class="pdf-button" id="pdf-button" aria-label="botão pdf" onclick="abrirAluno()">
 								<i class="fas fa-file-pdf"></i></button>

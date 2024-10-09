@@ -69,12 +69,12 @@
         $registro[] = $NomeLivro;
         $registro[] = $EditoraLivro;
         $registro[] = $Tombo;
-        $registro[] = $IBSMLivro;
         $registro[] = $QuantidadeLivros;
         $registro[] = $GeneroLivro;
         $registro[] = $IdiomaLivro;
-        $registro[] = $NomeAutor;
-        $registro[] = "<a href='../Controller/CExcluir_livros.php?id={$row_Li["idLivro"]}'><button class='close-popup-button'><i class='fa fa-trash'></i></button></a>";
+        $registro[] = "<button type='button' class='btn btn-outline-primary' id='$idLivro' onclick='visLivro($idLivro)'><i class='fas fa-eye'></i></button>";
+        $registro[] = "<button type='button' class='btn btn-outline-warning' id='$idLivro' onclick='editLivro($idLivro)'><i class='fas fa-pen'></i></button>";
+        $registro[] = "<button type='button' class='btn btn-outline-danger' id='$idLivro' onclick='excluirLivro($idLivro)'><i class='fas fa-trash-alt'></i></button>";
 
 
         $dados[] = $registro;

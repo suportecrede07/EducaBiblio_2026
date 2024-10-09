@@ -28,6 +28,7 @@ include('../Controller/CPendencias.php'); // Inclua o arquivo CPendencias.php aq
 	<script src="../ArquivosExternos/icons.js"></script>
 	<link rel="shortcut icon" href="../img/icon1.png" type="image/x-icon">
 	<link rel="stylesheet" href="../CSS/style.css">
+	<link rel="stylesheet" href="../lib/datatables/dataTables.dataTables.min.css">
 	<link rel="stylesheet" href="../CSS/darkPaginacao.css">
 </head>
 
@@ -214,7 +215,7 @@ include('../Controller/CPendencias.php'); // Inclua o arquivo CPendencias.php aq
 					<span class="text">
 						<h3><?php
 							try {
-								$sql = "SELECT COUNT(*) as total FROM emprestimo WHERE StatusEmprestimo = 1";
+								$sql = "SELECT COUNT(*) as total FROM emprestimo WHERE StatusEmprestimo = 3";
 								$stmt = $conn->prepare($sql);
 								$stmt->execute();
 								$result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -322,7 +323,7 @@ include('../Controller/CPendencias.php'); // Inclua o arquivo CPendencias.php aq
 			<div class="table-data">
 				<div class="order">
 					<div class="head">
-						<h3>Histórico de empréstimos</h3>
+						<h3>Histórico de Empréstimos</h3>
 
 						<button class="pdf-button" id="pdf-button" aria-label="botão pdf" onclick="abrirAluno()">
 							<i class="fas fa-file-pdf"></i></button>
@@ -335,7 +336,7 @@ include('../Controller/CPendencias.php'); // Inclua o arquivo CPendencias.php aq
 						</script>
 
 					</div>
-					<table id="TableHistorico" class="table table-success" style="width:100%">
+					<table id="TableHistorico" class="table" style="width:100%">
 								<thead>
 									<tr>
 										<th>Id</th>
@@ -348,31 +349,7 @@ include('../Controller/CPendencias.php'); // Inclua o arquivo CPendencias.php aq
 								</thead>
 							</table>
 
-							<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-    						<script src="https://cdn.datatables.net/2.1.4/js/dataTables.js"></script>
-
-							<script>
-    							new DataTable('#TableHistorico', {
-									ajax: {
-										"url": '../View/listarHistorico.php',
-										"dataType": 'JSON',
-										"error": function () {
-											alert('Não há registros para sua pesquisa');
-										}
-									},
-									processing: true,
-									serverSide: true,
-									language: {
-										url: "../lib/pt_br.json"
-									},
-									columnDefs: [{
-										"defaultContent": "-",
-										"targets": "_all",
-										"className": "dt-body-center"
-									}],
-									"lengthMenu": [[10, 15, 25, 50, 100, -1], [10, 15, 25, 50, 100, "Tudo"]],
-    							});
-    						</script>
+							
 						</table>
 					
 					</div>
@@ -387,8 +364,33 @@ include('../Controller/CPendencias.php'); // Inclua o arquivo CPendencias.php aq
 	</section>
 
 	<script src="../JS/script.js"></script>
+	<script src="../lib/jquery/jquery-3.7.1.min.js"></script>
+	<script src="../lib/datatables/dataTables.js"></script>
+	<script src="../lib/Bootstrap 2/bootstrap.bundle.min.js"></script>
 
-	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+	<script>
+		new DataTable('#TableHistorico', {
+			ajax: {
+				"url": '../View/listarHistorico.php',
+				"dataType": 'JSON',
+				"error": function () {
+					alert('Não há registros para sua pesquisa');
+				}
+			},
+			processing: true,
+			serverSide: true,
+			language: {
+				url: "../lib/pt_br.json"
+			},
+			columnDefs: [{
+				"defaultContent": "-",
+				"targets": "_all",
+				"className": "dt-body-center"
+			}],
+			"lengthMenu": [[10, 15, 25, 50, 100, -1], [10, 15, 25, 50, 100, "Tudo"]],
+		});
+	</script>
 	<script>
 		$('#searchInput').on('keyup', function() {
 			const value = $(this).val().toLowerCase();
