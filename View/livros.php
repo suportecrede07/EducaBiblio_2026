@@ -154,6 +154,8 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 							<option value="10">Crônica</option>
 							<option value="11">Quadrinhos</option>
 							<option value="12">Didático</option>
+							<option value="13">Mitologia</option>
+							<option value="14">Teatro</option>
 						</select>
 						<select name="Idioma_idIdioma" id="Idioma_idIdioma" class="box select-dark-mode">
 							<option value="1">Português</option>
@@ -297,6 +299,8 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 											<option value="10">Crônica</option>
 											<option value="11">Quadrinhos</option>
 											<option value="12">Didático</option>
+											<option value="13">Mitologia</option>
+											<option value="14">Teatro</option>
 										</select>
 									</div>
 									<div class="mb-3">

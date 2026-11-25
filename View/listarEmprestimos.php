@@ -16,21 +16,22 @@
     
     
     $sqlAlunos = "
-    SELECT
-        livro.NomeLivro AS TituloLivro,
-        genero.NomeGenero AS NomeGenero,
-        emprestimo.idEmprestimo AS idEmprestimo,
-        turma.AnoTurma AS AnoTurma,
-        turma.NomeTurma AS NomeTurma,
-        aluno.NomeAluno AS NomeAluno,
-        emprestimo.DataEmprestimo AS DataEmprestimo,
-        devolucao.DataDevolucao AS DataDevolucao
-    FROM emprestimo
-    LEFT JOIN aluno ON emprestimo.aluno_idAluno = aluno.idAluno
-    INNER JOIN turma ON aluno.Turma_idTurma = turma.IdTurma
-    LEFT JOIN devolucao ON emprestimo.idEmprestimo = devolucao.emprestimo_idEmprestimo
-    INNER JOIN livro ON emprestimo.livro_idLivro = livro.idLivro
-    INNER JOIN genero ON livro.Genero_idGenero = genero.idGenero";
+SELECT
+    livro.NomeLivro AS TituloLivro,
+    genero.NomeGenero AS NomeGenero,
+    emprestimo.idEmprestimo AS idEmprestimo,
+    turma.AnoTurma AS AnoTurma,
+    turma.NomeTurma AS NomeTurma,
+    aluno.NomeAluno AS NomeAluno,
+    emprestimo.DataEmprestimo AS DataEmprestimo,
+    devolucao.DataDevolucao AS DataDevolucao
+FROM emprestimo
+LEFT JOIN aluno ON emprestimo.aluno_idAluno = aluno.idAluno
+INNER JOIN turma ON aluno.Turma_idTurma = turma.IdTurma
+LEFT JOIN devolucao ON emprestimo.idEmprestimo = devolucao.emprestimo_idEmprestimo
+INNER JOIN livro ON emprestimo.livro_idLivro = livro.idLivro
+INNER JOIN genero ON livro.Genero_idGenero = genero.idGenero
+";
     
     //Acessa o if quando ha parametros de pesquisa
     if(!empty($dados_requisicao['search']['value'])) {
@@ -38,8 +39,10 @@
         $sqlAlunos .= " OR aluno.NomeAluno LIKE :nomeAluno ";
         $sqlAlunos .= " OR emprestimo.idEmprestimo LIKE :idEmprestimo ";
     }
-
+    $sqlAlunos .= " ORDER BY emprestimo.DataEmprestimo DESC";
     $sqlAlunos .= " LIMIT :inicio , :quantidade";
+
+
 
     
     $result_Emprestimos = $conn->prepare($sqlAlunos);

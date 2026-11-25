@@ -38,3 +38,6 @@ body.dark {
     background-color: var(--borda);
     color: var(--fontee);
 }
+.lb{
+    color: var(--fontee);
+}

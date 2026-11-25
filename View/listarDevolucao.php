@@ -38,10 +38,9 @@
 
     if(!empty($dados_requisicao['search']['value'])){
         $sqlAlunos .= " WHERE l.NomeLivro like :livro ";
+        $sqlAlunos .= " OR l.Tombo like :tombo ";
         $sqlAlunos .= " OR a.NomeAluno like :leitor ";
-        $sqlAlunos .= " OR p.Nomeprof like :leitor2 ";
-        $sqlAlunos .= " OR e.StatusEmprestimo like :estado ";
-        $sqlAlunos .= " OR l.Tombo like :Tombo ";
+        $sqlAlunos .= " OR p.NomeProf like :leitor2 ";
     }
 
     $sqlAlunos .= " ORDER BY ID desc LIMIT :inicio , :quantidade";
@@ -55,10 +54,9 @@
     if(!empty($dados_requisicao['search']['value'])){
         $valor_pesq = "%" . $dados_requisicao['search']['value'] . "%";
         $result_Emprestimos->bindParam(':livro', $valor_pesq, PDO::PARAM_STR);
+        $result_Emprestimos->bindParam(':tombo', $valor_pesq, PDO::PARAM_STR);
         $result_Emprestimos->bindParam(':leitor', $valor_pesq, PDO::PARAM_STR);
         $result_Emprestimos->bindParam(':leitor2', $valor_pesq, PDO::PARAM_STR);
-        $result_Emprestimos->bindParam(':estado', $valor_pesq, PDO::PARAM_STR);
-        $result_Emprestimos->bindParam(':Tombo', $valor_pesq, PDO::PARAM_STR);
     }
 
     $result_Emprestimos->execute();

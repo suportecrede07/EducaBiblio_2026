@@ -20,7 +20,8 @@ if (empty($dados['idAluno'])) {
                 LEFT JOIN turma ON aluno.Turma_idTurma = turma.idTurma
                 SET NomeAluno=:NomeAluno,
                 turma.AnoTurma=:AnoTurma,
-                turma.nomeTurma=:nomeTurma
+                turma.nomeTurma=:nomeTurma,
+                aluno.EmailAluno = :contatoTurma
                 WHERE idAluno=:idAluno";
     
     
@@ -29,6 +30,7 @@ if (empty($dados['idAluno'])) {
     $edit_Alunos->bindParam(':NomeAluno', $dados['NomeAluno']);
     $edit_Alunos->bindParam(':AnoTurma', $dados['AnoTurma']);
     $edit_Alunos->bindParam(':nomeTurma', $dados['nomeTurma']);
+    $edit_Alunos->bindParam(':contatoTurma', $dados['contatoTurma']);
 
     if ($edit_Alunos->execute()) {
         $retorna = ['status' => true, 'msg' => '<div class="alert alert-success" role="alert">Aluno editado com sucesso</div>'];

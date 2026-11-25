@@ -8,6 +8,7 @@ class CEmprestimoControllerProf
         if (isset($_POST['emprestar'])) {
             // Obtenha os dados do formulário
             $dataEmprestimo = $_POST['DataEmprestimo'];
+            $dataDevolucao = $_POST['DataDevolucao'];
             $livroId = $_POST['livro_idLivro'];
             $usuarioId = $_POST['usuario_idUsuario'];
             $profId = $_POST['prof_idProf']; // Novo campo para o ID do professor
@@ -44,9 +45,7 @@ class CEmprestimoControllerProf
                     // Insira lógica para adicionar uma entrada de devolução pendente na tabela 'devolucao'
                     $emprestimoId = $conn->lastInsertId(); // Obtém o ID do empréstimo recém-inserido
 
-                    $dataDevolucao = date('d/m/Y', strtotime($dataEmprestimo . ' + 7 days')); // Define a data de devolução após 7 dias (por exemplo)
-
-                    $queryInsertDevolucao = "INSERT INTO devolucao (DataDevolucao, StatusDevolucao, emprestimo_idEmprestimo) VALUES (:dataDevolucao, 'Pendente', :emprestimoId)";
+                    $queryInsertDevolucao = "INSERT INTO devolucao (DataDevolucao, emprestimo_idEmprestimo) VALUES (:dataDevolucao, :emprestimoId)";
                     $stmtInsertDevolucao = $conn->prepare($queryInsertDevolucao);
                     $stmtInsertDevolucao->bindParam(':dataDevolucao', $dataDevolucao);
                     $stmtInsertDevolucao->bindParam(':emprestimoId', $emprestimoId);

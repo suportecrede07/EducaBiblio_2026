@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->bindParam(':EditoraLivro', $_POST['EditoraLivro']);
             $stmt->bindParam(':EdicaoLivro', $_POST['EdicaoLivro']);
             $stmt->bindParam(':QuantidadeLivros', $_POST['QuantidadeLivros']);
-            $stmt->bindParam(':DidaticoLivro', $dadosLivro['DidaticoLivro']);
+            $stmt->bindParam(':DidaticoLivro', $_POST['DidaticoLivro']);
 
             // Executar a consulta
             $stmt->execute();

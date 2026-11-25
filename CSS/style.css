@@ -196,6 +196,14 @@ input[type="file"].box {
     border-radius: 5px;
 }
 
+input[type="file"].boxDatas {
+    background-color: #333;
+    color: #fff;
+    border: var(--bordinha);
+    padding: 10px;
+    border-radius: 5px;
+}
+
 input[type="file"].box+label {
     color: var(--brancoFundo);
     border: var(--bordinha);
@@ -978,6 +986,7 @@ p {
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-left: 2rem;
 }
 
 .box {
@@ -1013,9 +1022,10 @@ p {
 .tabela .row form {
     flex: 1 1 30rem;
     background-color: var(--light);
-    padding: 1rem;
+    margin: 1rem;
+    padding: 2rem;
     text-align: center;
-    border-radius: 2% 2%;
+    border-radius: 2%;
 }
 
 .tabela .row form h3 {
@@ -1090,6 +1100,70 @@ p {
     color: var(--cinzaEscuro);
     border-radius: 10px;
     font-family: Arial, Helvetica, sans-serif;
+}
+
+.boxDatas1 {
+    padding: 1rem;
+    border: 1px solid #ccc;
+    transition: border-color 0.3s, background-color 0.3s;
+    color: var(--cinzaEscuro);
+}
+.boxDatas2 {
+    padding: 1rem;
+    border: 1px solid #ccc;
+    transition: border-color 0.3s, background-color 0.3s;
+    color: var(--cinzaEscuro);
+}
+
+.boxDatas3 {
+    padding: 1rem;
+    border: 1px solid #ccc;
+    transition: border-color 0.3s, background-color 0.3s;
+    color: var(--cinzaEscuro);
+}
+
+
+.tabela .row form .boxDatas1 {
+    height: 50px;
+    width: 99%;
+    border: none;
+    background-color: var(--brancoFundo);
+    font-size: 0.9rem;
+    color: var(--cinzaEscuro);
+    border-radius: 10px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.tabela .row form .boxDatas2 {
+    height: 50px;
+    width: 99%;
+    border: none;
+    background-color: var(--brancoFundo);
+    font-size: 0.9rem;
+    color: var(--cinzaEscuro);
+    border-radius: 10px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.tabela .row form .boxDatas3 {
+    height: 50px;
+    width: 99%;
+    border: none;
+    background-color: var(--brancoFundo);
+    font-size: 0.9rem;
+    color: var(--cinzaEscuro);
+    border-radius: 10px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.tabela .row form .flex-container {
+    display: flex;
+    margin-left: 23px;
+    width: 1500px;
+}
+
+.tabela .row form .containerDatas {
+    width: 460px;
+    margin: 0 1rem 0 1rem
 }
 
 .tabela .row form .box:focus {
