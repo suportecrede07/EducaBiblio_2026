@@ -1,6 +1,7 @@
-<?php
+﻿<?php
 
 include 'config.php';
+date_default_timezone_set('America/Fortaleza');
 
 $sqlAlunos = "SELECT emprestimo.idEmprestimo, aluno.NomeAluno AS Leitor, turma.NomeTurma AS Turma, turma.AnoTurma, livro.NomeLivro AS Livro, emprestimo.StatusEmprestimo AS Estado, IFNULL(DATE_FORMAT(devolucao.DataDevolucao, '%d/%m/%Y'), '-') AS DataDevolucaoFmt
 FROM emprestimo

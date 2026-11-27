@@ -1,8 +1,9 @@
-<?php
+﻿<?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 include 'config.php';
+date_default_timezone_set('America/Fortaleza');
 
 $aluno_id = isset($_GET['aluno']) ? intval($_GET['aluno']) : 0;
 $sql = "

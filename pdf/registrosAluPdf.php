@@ -1,6 +1,7 @@
-<?php
+﻿<?php
 
 include 'config.php';
+date_default_timezone_set('America/Fortaleza');
 
 $idAluno = isset($_GET['idAluno']) ? intval($_GET['idAluno']) : 0;
 $where = $idAluno > 0 ? "WHERE aluno.idAluno = $idAluno" : "";
