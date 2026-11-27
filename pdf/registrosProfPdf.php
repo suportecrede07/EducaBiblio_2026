@@ -2,164 +2,114 @@
 
 include 'config.php';
 
-// Verifica se o parâmetro 'idAluno' está presente na requisição
-if (isset($_GET['idProf'])) {
-    $idProf = $_GET['idProf'];
+$idProf = isset($_GET['idProf']) ? intval($_GET['idProf']) : 0;
+$where = $idProf > 0 ? "WHERE prof.idProf = $idProf" : "";
 
-    // Modifica a consulta SQL para filtrar pelo ID do aluno
-    $sql = "SELECT
+$sql = "SELECT
     emprestimo.idEmprestimo,
-    prof.NomeProf AS Estudante,
+    prof.NomeProf AS Professor,
     DATE_FORMAT(emprestimo.DataEmprestimo, '%d/%m/%Y') AS DataEmprestimoFormatada,
-    IFNULL(DATE_FORMAT(devolucao.DataDevolucao, '%d/%m/%Y'), '--/--/----') AS DataDevolucaoFormatada,
-    IFNULL(DATE_FORMAT(devolucao.DataDevolvida, '%d/%m/%Y'), '--/--/----') AS DataDevolvidaFormatada,
+    IFNULL(DATE_FORMAT(devolucao.DataDevolucao, '%d/%m/%Y'), '-') AS DataDevolucaoFormatada,
+    IFNULL(DATE_FORMAT(devolucao.DataDevolvida, '%d/%m/%Y'), '-') AS DataDevolvidaFormatada,
     CASE
-        WHEN emprestimo.StatusEmprestimo = 0 THEN 'Dentro do prazo'
-        WHEN emprestimo.StatusEmprestimo = 1 THEN 'Pendente'
+        WHEN emprestimo.StatusEmprestimo = 1 THEN 'A prazo'
         WHEN emprestimo.StatusEmprestimo = 2 THEN 'Devolvido'
-        ELSE 'Status não definido'
+        WHEN emprestimo.StatusEmprestimo = 3 THEN 'Pendente'
+        ELSE 'Não definido'
     END AS Estado,
-    livro.idLivro,
     livro.NomeLivro,
-    livro.EditoraLivro,
-    livro.IBSMLivro,
-    livro.QuantidadeLivros,
-    genero.NomeGenero AS GeneroLivro,
-    idioma.Idioma AS IdiomaLivro,
-    livro.FotoLivro,
-    livro.CaminhoFotoLivro,
-    livro.LocalLivro,
-    livro.PrateleiraLivro,
-    livro.ColunaLivro,
-    autor.NomeAutor
+    livro.Tombo
 FROM emprestimo
 LEFT JOIN prof ON emprestimo.prof_idProf = prof.idProf
 LEFT JOIN devolucao ON emprestimo.idEmprestimo = devolucao.emprestimo_idEmprestimo
 LEFT JOIN livro ON emprestimo.livro_idLivro = livro.idLivro
-LEFT JOIN genero ON livro.Genero_idGenero = genero.idGenero
-LEFT JOIN autor ON livro.autor_idAutor = autor.idAutor
-LEFT JOIN idioma ON livro.Idioma_idIdioma = idioma.idIdioma
-WHERE prof.idProf = $idProf;
-";
-} else {
-    // Se 'idAluno' não estiver presente, mostra todos os empréstimos (consulta original)
-    $sql = "SELECT
-                emprestimo.idEmprestimo,
-                prof.NomeProf AS Estudante,
-                DATE_FORMAT(emprestimo.DataEmprestimo, '%d/%m/%Y') AS DataEmprestimoFormatada,
-                IFNULL(DATE_FORMAT(devolucao.DataDevolucao, '%d/%m/%Y'), '--/--/----') AS DataDevolucaoFormatada,
-                IFNULL(DATE_FORMAT(devolucao.DataDevolvida, '%d/%m/%Y'), '--/--/----') AS DataDevolvidaFormatada,
-                CASE
-                    WHEN emprestimo.StatusEmprestimo = 0 THEN 'A prazo'
-                    WHEN emprestimo.StatusEmprestimo = 1 THEN 'Pendente'
-                    WHEN emprestimo.StatusEmprestimo = 2 THEN 'Devolvido'
-                    ELSE 'Status não definido'
-                END AS Estado
-            FROM emprestimo
-            LEFT JOIN prof ON emprestimo.prof_idProf = prof.idProf
-            LEFT JOIN devolucao ON emprestimo.idEmprestimo = devolucao.emprestimo_idEmprestimo";
-}
+$where
+ORDER BY emprestimo.DataEmprestimo DESC";
 
 $res = $conn->query($sql);
 
-if ($res->num_rows > 0) {
+if ($res && $res->num_rows > 0) {
+    $dataHora = date('d/m/Y H:i');
+    $css = file_get_contents('../CSS/relatorios.css');
+
+    // Identificar nome do professor
+    $firstRow = $res->fetch_object();
+    $nomeProf = !empty($firstRow->Professor) ? $firstRow->Professor : 'Todos os Professores';
+    $res->data_seek(0);
+
     $html = "<html>
     <head>
-    <title>EducaBiblio</title>
+        <meta charset='UTF-8'>
+        <title>EducaBiblio - Histórico do Professor</title>
         <style>
-            body {
-                font-family: 'Arial', sans-serif;
-                margin: 0;
-                padding: 0;
-            }
-            h1 {
-                text-align: center;
-                color: #ffffff;
-                margin-bottom: 20px;
-                background-color: rgba(76,175,80); 
-                padding: 10px; 
-            }
-            #library-info {
-                text-align: center;
-                margin: 20px 0;
-            }
-            table {
-                border-collapse: collapse;
-                width: 100%;
-                margin-top: 20px;
-                background-color: #fff;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            }
-            th, td {
-                border: 1px solid #333;
-                padding: 12px;
-                text-align: center;
-            }
-            th {
-                background-color: #4CAF50;
-                color: white;
-                font-weight: bolder;
-            }
-            tbody tr:nth-child(even) {
-                background-color: #f2f2f2; /* Light Gray */
-            }
-            tbody tr:nth-child(odd) {
-                background-color: #fff; /* White */
-            }
-            .footer {
-                position: fixed;
-                bottom: 0;
-                width: 100%;
-                text-align: center;
-                background-color: #4CAF50;
-                color: white;
-                padding: 10px;
-                font-weight: bold;
-            }
+            $css
         </style>
     </head>
     <body>
-        <div id='library-info'>
-            <h1>Histórico de empréstimos</h1>
-            <p>
-                Bem-vindo ao EducaBiblio, o seu sistema de biblioteca dedicado à promoção da educação e leitura! Abaixo, apresentamos o histórico de empréstimos já feitos pelo professor.
-            </p>
-        </div>
-        <table>
+        <div class='header-wrapper'>
+            <table class='header-table'>
+                <tr>
+                    <td class='header-title-box'>
+                        <div class='header-system-name'>EducaBiblio</div>
+                        <div class='header-subtitle'>Sistema de Gestão Bibliotecária e Leitura</div>
+                    </td>
+                    <td class='header-report-badge'>
+                        <div class='report-badge-title'>Histórico de Leitura</div>
+                        <div class='report-date'>Emitido em: {$dataHora}</div>
+                    </td>
+                </tr>
+            </table>
+        </div>";
+
+    if ($idProf > 0) {
+        $html .= "<div class='user-card'>
+            Professor(a): <span>" . htmlspecialchars($nomeProf) . "</span>
+        </div>";
+    }
+
+    $html .= "
+        <table class='data-table'>
             <thead>
                 <tr>
-                <th>Professor</th>
-                <th>Livro</th>
-                <th>Data do Empréstimo</th>
-                <th>Data de Devolução</th>
-                <th>Data em que foi Devolvido</th>
-                <th>Estado</th>
+                    <th style='width: 32%;'>Título da Obra</th>
+                    <th class='center' style='width: 12%;'>Tombo</th>
+                    <th class='center' style='width: 18%;'>Data Empréstimo</th>
+                    <th class='center' style='width: 18%;'>Data Devolução</th>
+                    <th class='center' style='width: 20%;'>Situação</th>
                 </tr>
             </thead>
             <tbody>";
 
     while ($row = $res->fetch_object()) {
+        $tombo = !empty($row->Tombo) ? $row->Tombo : '-';
+        $badgeClass = 'badge-prazo';
+        if ($row->Estado === 'Devolvido') $badgeClass = 'badge-devolvido';
+        if ($row->Estado === 'Pendente') $badgeClass = 'badge-pendente';
+
         $html .= "<tr>";
-
-        $html .= "<td>" . $row->Estudante . "</td>";
-        $html .= "<td>" . $row->NomeLivro . "</td>";
-        $html .= "<td>" . $row->DataEmprestimoFormatada . "</td>";
-        $html .= "<td>" . $row->DataDevolucaoFormatada . "</td>";
-        $html .= "<td>" . $row->DataDevolvidaFormatada . "</td>";
-        $html .= "<td>" . $row->Estado . "</td>";
-
+        $html .= "<td><strong>" . htmlspecialchars($row->NomeLivro) . "</strong></td>";
+        $html .= "<td class='center'>" . htmlspecialchars($tombo) . "</td>";
+        $html .= "<td class='center'>" . htmlspecialchars($row->DataEmprestimoFormatada) . "</td>";
+        $html .= "<td class='center'>" . htmlspecialchars($row->DataDevolvidaFormatada) . "</td>";
+        $html .= "<td class='center'><span class='badge-status {$badgeClass}'>" . htmlspecialchars($row->Estado) . "</span></td>";
         $html .= "</tr>";
     }
 
     $html .= "</tbody>
         </table>
-        <div class='footer'>
-        Governo do Estado do Ceará - Educação e Leitura
+
+        <div class='footer-wrapper'>
+            <table class='footer-table'>
+                <tr>
+                    <td>Governo do Estado do Ceará &bull; Secretaria da Educação &bull; EducaBiblio</td>
+                    <td class='footer-right'>Ficha Individual de Empréstimos</td>
+                </tr>
+            </table>
         </div>
     </body>
     </html>";
 } else {
-    $html = 'Não há dados a serem exibidos.';
+    $html = "<div style='font-family: Arial; padding: 20px; text-align: center; color: #666;'><h3>Não há registros de empréstimos para este professor.</h3></div>";
 }
 
 use Dompdf\Dompdf;
@@ -167,13 +117,8 @@ use Dompdf\Dompdf;
 require_once 'dompdf/autoload.inc.php';
 
 $dompdf = new Dompdf();
-
 $dompdf->loadHtml($html);
-
-$dompdf->set_option('defaultFont', 'sans');
-
-$dompdf->setPaper('A4', 'landscape');
-
+$dompdf->set_option('defaultFont', 'Helvetica');
+$dompdf->setPaper('A4', 'portrait');
 $dompdf->render();
-
-$dompdf->stream("Histórico", array("Attachment" => false));
+$dompdf->stream("Historico_Professor.pdf", array("Attachment" => false));

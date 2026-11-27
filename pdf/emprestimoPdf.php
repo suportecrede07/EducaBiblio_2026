@@ -5,13 +5,14 @@ include 'config.php';
 $sqlAlunos = "
     SELECT
         livro.NomeLivro AS TituloLivro,
+        livro.Tombo,
         genero.NomeGenero,
         emprestimo.idEmprestimo,
         turma.NomeTurma,
         aluno.NomeAluno,
         turma.AnoTurma,
-        emprestimo.DataEmprestimo,
-        devolucao.DataDevolucao,
+        DATE_FORMAT(emprestimo.DataEmprestimo, '%d/%m/%Y') AS DataEmprestimoFmt,
+        IFNULL(DATE_FORMAT(devolucao.DataDevolucao, '%d/%m/%Y'), '-') AS DataDevolucaoFmt,
         emprestimo.Quantidade_emp,
         usuario.UserUsuario
     FROM emprestimo
@@ -25,13 +26,14 @@ $sqlAlunos = "
 $sqlProfessores = "
     SELECT
         livro.NomeLivro AS TituloLivro,
+        livro.Tombo,
         genero.NomeGenero,
         emprestimo.idEmprestimo,
         'Professor' AS NomeTurma,
-        prof.NomeProf AS NomeLeitor,
-        NULL AS AnoTurma,
-        emprestimo.DataEmprestimo,
-        devolucao.DataDevolucao,
+        prof.NomeProf AS NomeAluno,
+        '' AS AnoTurma,
+        DATE_FORMAT(emprestimo.DataEmprestimo, '%d/%m/%Y') AS DataEmprestimoFmt,
+        IFNULL(DATE_FORMAT(devolucao.DataDevolucao, '%d/%m/%Y'), '-') AS DataDevolucaoFmt,
         emprestimo.Quantidade_emp,
         usuario.UserUsuario
     FROM emprestimo
@@ -40,109 +42,85 @@ $sqlProfessores = "
     INNER JOIN genero ON livro.Genero_idGenero = genero.idGenero
     INNER JOIN usuario ON emprestimo.usuario_idUsuario = usuario.idUsuario
     LEFT JOIN devolucao ON emprestimo.idEmprestimo = devolucao.emprestimo_idEmprestimo
-    WHERE prof.idProf IS NOT NULL"; // Usando a condição na tabela 'prof'
+    WHERE prof.idProf IS NOT NULL";
 
-// Consulta geral unindo empréstimos de alunos e professores
-$sql = "($sqlAlunos) UNION ($sqlProfessores)";
+$sql = "($sqlAlunos) UNION ($sqlProfessores) ORDER BY DataEmprestimoFmt DESC";
 $res = $conn->query($sql);
 
-if ($res->num_rows > 0) {
+if ($res && $res->num_rows > 0) {
+    $dataHora = date('d/m/Y H:i');
+    $css = file_get_contents('../CSS/relatorios.css');
+
     $html = "<html>
     <head>
-    <title>EducaBiblio</title>
+        <meta charset='UTF-8'>
+        <title>EducaBiblio - Relatório de Empréstimos</title>
         <style>
-            body {
-                font-family: 'Arial', sans-serif;
-                margin: 0;
-                padding: 0;
-            }
-            h1 {
-                text-align: center;
-                color: #ffffff;
-                margin-bottom: 20px;
-                background-color: rgba(76,175,80); 
-                padding: 10px; 
-            }
-            #library-info {
-                text-align: center;
-                margin: 20px 0;
-            }
-            table {
-                border-collapse: collapse;
-                width: 100%;
-                margin-top: 20px;
-                background-color: #fff;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            }
-            th, td {
-                border: 1px solid #333;
-                padding: 12px;
-                text-align: center;
-            }
-            th {
-                background-color: #4CAF50;
-                color: white;
-                font-weight: bolder;
-            }
-            tbody tr:nth-child(even) {
-                background-color: #f2f2f2; /* Light Gray */
-            }
-            tbody tr:nth-child(odd) {
-                background-color: #fff; /* White */
-            }
-            .footer {
-                position: fixed;
-                bottom: 0;
-                width: 100%;
-                text-align: center;
-                background-color: #4CAF50;
-                color: white;
-                padding: 10px;
-                font-weight: bold;
-            }
+            $css
         </style>
     </head>
     <body>
-        <div id='library-info'>
-            <h1>Tabela de Empréstimos</h1>
-            <p>
-                Bem-vindo ao EducaBiblio, o seu sistema de biblioteca dedicado à promoção da educação e leitura! Abaixo, apresentamos os registros dos empréstimos realizados.
-            </p>
+        <div class='header-wrapper'>
+            <table class='header-table'>
+                <tr>
+                    <td class='header-title-box'>
+                        <div class='header-system-name'>EducaBiblio</div>
+                        <div class='header-subtitle'>Sistema de Gestão Bibliotecária e Leitura</div>
+                    </td>
+                    <td class='header-report-badge'>
+                        <div class='report-badge-title'>Registro Geral de Empréstimos</div>
+                        <div class='report-date'>Emitido em: {$dataHora}</div>
+                    </td>
+                </tr>
+            </table>
         </div>
-        <table>
+
+        <div class='report-intro'>
+            Abaixo estão apresentados todos os <strong>empréstimos realizados</strong> para alunos e professores registrados no sistema.
+        </div>
+
+        <table class='data-table'>
             <thead>
                 <tr>
-                <th>Título do livro</th>
-                <th>Tombo</th>
-                <th>Leitor</th>
-                <th>Turma</th>
-                <th>Data do empréstimo</th>
-                <th>Usuário</th>
+                    <th style='width: 25%;'>Título do Livro</th>
+                    <th class='center' style='width: 10%;'>Tombo</th>
+                    <th style='width: 22%;'>Leitor (Aluno / Professor)</th>
+                    <th style='width: 15%;'>Turma / Vínculo</th>
+                    <th class='center' style='width: 14%;'>Data Empréstimo</th>
+                    <th class='center' style='width: 14%;'>Atendente</th>
                 </tr>
             </thead>
             <tbody>";
 
     while ($row = $res->fetch_object()) {
-        $html .= "<tr>";
-        $html .= "<td>" . $row->TituloLivro . "</td>";
-        $html .= "<td>" . $row->Tombo . "</td>";
-        $html .= "<td>" . (isset($row->NomeAluno) ? $row->NomeAluno : $row->NomeLeitor) . "</td>";
-        $html .= "<td>" . $row->AnoTurma . ' ' . $row->NomeTurma . "</td>";
-        $html .= "<td>" . $row->DataEmprestimo . "</td>";
-        $html .= "<td>" . $row->UserUsuario . "</td>";
+        $turma = !empty($row->AnoTurma) ? $row->AnoTurma . 'º ' . $row->NomeTurma : $row->NomeTurma;
+        $tombo = !empty($row->Tombo) ? $row->Tombo : '-';
 
+        $html .= "<tr>";
+        $html .= "<td><strong>" . htmlspecialchars($row->TituloLivro) . "</strong></td>";
+        $html .= "<td class='center'>" . htmlspecialchars($tombo) . "</td>";
+        $html .= "<td>" . htmlspecialchars($row->NomeAluno) . "</td>";
+        $html .= "<td>" . htmlspecialchars($turma) . "</td>";
+        $html .= "<td class='center'>" . htmlspecialchars($row->DataEmprestimoFmt) . "</td>";
+        $html .= "<td class='center'>" . htmlspecialchars($row->UserUsuario) . "</td>";
         $html .= "</tr>";
     }
 
     $html .= "</tbody>
         </table>
-        <div class='footer'>
-        Governo do Estado do Ceará - Educação e Leitura
+
+        <div class='footer-wrapper'>
+            <table class='footer-table'>
+                <tr>
+                    <td>Governo do Estado do Ceará &bull; Secretaria da Educação &bull; EducaBiblio</td>
+                    <td class='footer-right'>Relatório Institucional de Circulação</td>
+                </tr>
+            </table>
         </div>
     </body>
     </html>";
 } else {
-    $html = 'Não há dados a serem exibidos.';
+    $html = "<div style='font-family: Arial; padding: 20px; text-align: center; color: #666;'><h3>Não há registros de empréstimos a serem exibidos.</h3></div>";
 }
 
 use Dompdf\Dompdf;
@@ -150,13 +128,8 @@ use Dompdf\Dompdf;
 require_once 'dompdf/autoload.inc.php';
 
 $dompdf = new Dompdf();
-  
 $dompdf->loadHtml($html);
-
-$dompdf->set_option('defaultFont', 'sans');
-
+$dompdf->set_option('defaultFont', 'Helvetica');
 $dompdf->setPaper('A4', 'landscape');
-
 $dompdf->render();
-
-$dompdf->stream("Tabela de empréstimos", array("Attachment" => false));
+$dompdf->stream("Relatorio_Emprestimos.pdf", array("Attachment" => false));

@@ -29,106 +29,85 @@ $sql = "SELECT
 $res = $conn->query($sql);
 
 if ($res->num_rows > 0) {
+    $dataHora = date('d/m/Y H:i');
+    $css = file_get_contents('../CSS/relatorios.css');
+
     $html = "<html>
     <head>
-    <title>EducaBiblio</title>
+        <meta charset='UTF-8'>
+        <title>EducaBiblio - Catálogo de Livros</title>
         <style>
-            body {
-                font-family: 'Arial', sans-serif;
-                margin: 0;
-                padding: 0;
-            }
-            h1 {
-                text-align: center;
-                color: #ffffff;
-                margin-bottom: 20px;
-                background-color: rgba(76,175,80); 
-                padding: 10px; 
-            }
-            #library-info {
-                text-align: center;
-                margin: 20px 0;
-            }
-            table {
-                border-collapse: collapse;
-                width: 100%;
-                margin-top: 20px;
-                background-color: #fff;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            }
-            th, td {
-                border: 1px solid #333;
-                padding: 12px;
-                text-align: center;
-            }
-            th {
-                background-color: #4CAF50;
-                color: white;
-                font-weight: bolder;
-            }
-            tbody tr:nth-child(even) {
-                background-color: #f2f2f2; /* Light Gray */
-            }
-            tbody tr:nth-child(odd) {
-                background-color: #fff; /* White */
-            }
-            .footer {
-                position: fixed;
-                bottom: 0;
-                width: 100%;
-                text-align: center;
-                background-color: #4CAF50;
-                color: white;
-                padding: 10px;
-                font-weight: bold;
-            }
+            $css
         </style>
     </head>
     <body>
-        <div id='library-info'>
-            <h1>Tabela de Livros</h1>
-            <p>
-                Bem-vindo ao EducaBiblio, o seu sistema de biblioteca dedicado à promoção da educação e leitura! Abaixo, apresentamos os registros dos livros cadastrados.
-            </p>
+        <div class='header-wrapper'>
+            <table class='header-table'>
+                <tr>
+                    <td class='header-title-box'>
+                        <div class='header-system-name'>EducaBiblio</div>
+                        <div class='header-subtitle'>Sistema de Gestão Bibliotecária e Leitura</div>
+                    </td>
+                    <td class='header-report-badge'>
+                        <div class='report-badge-title'>Acervo Geral de Livros</div>
+                        <div class='report-date'>Emitido em: {$dataHora}</div>
+                    </td>
+                </tr>
+            </table>
         </div>
-        <table>
+
+        <div class='report-intro'>
+            Abaixo estão listadas todas as <strong>obras cadastradas no acervo</strong>, com identificação de autor, tombo, gênero, editora e quantidade disponível.
+        </div>
+
+        <table class='data-table'>
             <thead>
                 <tr>
-                    <th>Título</th>
-                    <th>Autor</th>
-                    <th>Tombo</th>
-                    <th>Editora</th>
-                    <th>ISBN/CDD</th>
-                    <th>Gênero</th>
-                    <th>Idioma</th>
-                    <th>Quant</th>
+                    <th style='width: 25%;'>Título da Obra</th>
+                    <th style='width: 18%;'>Autor</th>
+                    <th class='center' style='width: 10%;'>Tombo</th>
+                    <th style='width: 15%;'>Editora</th>
+                    <th style='width: 12%;'>ISBN / CDD</th>
+                    <th style='width: 12%;'>Gênero</th>
+                    <th class='center' style='width: 8%;'>Qtd</th>
                 </tr>
             </thead>
             <tbody>";
 
     while ($row = $res->fetch_object()) {
-        $html .= "<tr>";
-        $html .= "<td>" . $row->NomeLivro . "</td>";
-        $html .= "<td>" . (!empty($row->NomeAutor) ? $row->NomeAutor : '-') . "</td>";
-        $html .= "<td>" . $row->Tombo . "</td>";
-        $html .= "<td>" . $row->EditoraLivro . "</td>";
-        $html .= "<td>" . $row->IBSMLivro . "</td>";
-        $html .= "<td>" . $row->GeneroLivro . "</td>";
-        $html .= "<td>" . $row->IdiomaLivro . "</td>";
-        $html .= "<td>" . $row->QuantidadeLivros . "</td>";
+        $autor = !empty($row->NomeAutor) ? $row->NomeAutor : '-';
+        $tombo = !empty($row->Tombo) ? $row->Tombo : '-';
+        $editora = !empty($row->EditoraLivro) ? $row->EditoraLivro : '-';
+        $isbn = !empty($row->IBSMLivro) ? $row->IBSMLivro : '-';
+        $genero = !empty($row->GeneroLivro) ? $row->GeneroLivro : '-';
+        $qtd = isset($row->QuantidadeLivros) ? $row->QuantidadeLivros : '0';
 
+        $html .= "<tr>";
+        $html .= "<td><strong>" . htmlspecialchars($row->NomeLivro) . "</strong></td>";
+        $html .= "<td>" . htmlspecialchars($autor) . "</td>";
+        $html .= "<td class='center'>" . htmlspecialchars($tombo) . "</td>";
+        $html .= "<td>" . htmlspecialchars($editora) . "</td>";
+        $html .= "<td>" . htmlspecialchars($isbn) . "</td>";
+        $html .= "<td>" . htmlspecialchars($genero) . "</td>";
+        $html .= "<td class='center'><strong>" . htmlspecialchars($qtd) . "</strong></td>";
         $html .= "</tr>";
     }
 
     $html .= "</tbody>
         </table>
-        <div class='footer'>
-        Governo do Estado do Ceará - Educação e Leitura
+
+        <div class='footer-wrapper'>
+            <table class='footer-table'>
+                <tr>
+                    <td>Governo do Estado do Ceará &bull; Secretaria da Educação &bull; EducaBiblio</td>
+                    <td class='footer-right'>Relatório Institucional de Acervo</td>
+                </tr>
+            </table>
         </div>
     </body>
     </html>";
 } else {
-    $html = 'Não há dados a serem exibidos.';
+    $html = "<div style='font-family: Arial; padding: 20px; text-align: center; color: #666;'><h3>Não há livros cadastrados a serem exibidos.</h3></div>";
 }
 
 use Dompdf\Dompdf;
@@ -136,13 +115,8 @@ use Dompdf\Dompdf;
 require_once 'dompdf/autoload.inc.php';
 
 $dompdf = new Dompdf();
-
 $dompdf->loadHtml($html);
-
-$dompdf->set_option('defaultFont', 'sans');
-
+$dompdf->set_option('defaultFont', 'Helvetica');
 $dompdf->setPaper('A4', 'landscape');
-
 $dompdf->render();
-
-$dompdf->stream("Tabela de livros", array("Attachment" => false));
+$dompdf->stream("Relatorio_Livros.pdf", array("Attachment" => false));

@@ -2,126 +2,91 @@
 
 include 'config.php';
 
-$sqlAlunos = "SELECT emprestimo.idEmprestimo, aluno.NomeAluno AS Leitor, turma.NomeTurma AS Turma, livro.NomeLivro AS Livro, emprestimo.StatusEmprestimo AS Estado, devolucao.DataDevolucao
+$sqlAlunos = "SELECT emprestimo.idEmprestimo, aluno.NomeAluno AS Leitor, turma.NomeTurma AS Turma, turma.AnoTurma, livro.NomeLivro AS Livro, emprestimo.StatusEmprestimo AS Estado, IFNULL(DATE_FORMAT(devolucao.DataDevolucao, '%d/%m/%Y'), '-') AS DataDevolucaoFmt
 FROM emprestimo
 INNER JOIN aluno ON emprestimo.aluno_idAluno = aluno.idAluno
 INNER JOIN livro ON emprestimo.livro_idLivro = livro.idLivro
 INNER JOIN turma ON aluno.Turma_idTurma = turma.IdTurma
 LEFT JOIN devolucao ON emprestimo.idEmprestimo = devolucao.emprestimo_idEmprestimo WHERE emprestimo.StatusEmprestimo = 3";
 
-$sqlProfessores = "SELECT emprestimo.idEmprestimo, prof.NomeProf AS Professor, 'Professor' AS Turma, livro.NomeLivro AS Livro, emprestimo.StatusEmprestimo AS Estado, devolucao.DataDevolucao
+$sqlProfessores = "SELECT emprestimo.idEmprestimo, prof.NomeProf AS Leitor, 'Professor' AS Turma, '' AS AnoTurma, livro.NomeLivro AS Livro, emprestimo.StatusEmprestimo AS Estado, IFNULL(DATE_FORMAT(devolucao.DataDevolucao, '%d/%m/%Y'), '-') AS DataDevolucaoFmt
 FROM emprestimo
 INNER JOIN prof ON emprestimo.prof_idProf = prof.idProf
 INNER JOIN livro ON emprestimo.livro_idLivro = livro.idLivro
 LEFT JOIN devolucao ON emprestimo.idEmprestimo = devolucao.emprestimo_idEmprestimo WHERE emprestimo.StatusEmprestimo = 3";
 
-
-
 $sql = "($sqlAlunos) UNION ($sqlProfessores)";
 $res = $conn->query($sql);
 
-if ($res->num_rows > 0) {
+if ($res && $res->num_rows > 0) {
+    $dataHora = date('d/m/Y H:i');
+    $css = file_get_contents('../CSS/relatorios.css');
+
     $html = "<html>
     <head>
-    <title>EducaBiblio</title>
+        <meta charset='UTF-8'>
+        <title>EducaBiblio - Pendências de Empréstimo</title>
         <style>
-            body {
-                font-family: 'Arial', sans-serif;
-                margin: 0;
-                padding: 0;
-            }
-            h1 {
-                text-align: center;
-                color: #ffffff;
-                margin-bottom: 20px;
-                background-color: rgba(76,175,80); 
-                padding: 10px; 
-            }
-            #library-info {
-                text-align: center;
-                margin: 20px 0;
-            }
-            table {
-                border-collapse: collapse;
-                width: 100%;
-                margin-top: 20px;
-                background-color: #fff;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            }
-            th, td {
-                border: 1px solid #333;
-                padding: 12px;
-                text-align: center;
-            }
-            th {
-                background-color: #4CAF50;
-                color: white;
-                font-weight: bolder;
-            }
-            tbody tr:nth-child(even) {
-                background-color: #f2f2f2; /* Light Gray */
-            }
-            tbody tr:nth-child(odd) {
-                background-color: #fff; /* White */
-            }
-            .footer {
-                position: fixed;
-                bottom: 0;
-                width: 100%;
-                text-align: center;
-                background-color: #4CAF50;
-                color: white;
-                padding: 10px;
-                font-weight: bold;
-            }
+            $css
         </style>
     </head>
     <body>
-        <div id='library-info'>
-            <h1>Tabela de Pendências</h1>
-            <p>
-                Bem-vindo ao EducaBiblio, o seu sistema de biblioteca dedicado à promoção da educação e leitura! Abaixo, apresentamos os registros de devoluções realizadas.
-            </p>
-        </div>
-        <table>
-            <thead>
+        <div class='header-wrapper'>
+            <table class='header-table'>
                 <tr>
-                <th>Livro</th>
-                <th>Leitor</th>
-                <th>Turma</th>
-                <th>Data para Devolução</th>
+                    <td class='header-title-box'>
+                        <div class='header-system-name'>EducaBiblio</div>
+                        <div class='header-subtitle'>Sistema de Gestão Bibliotecária e Leitura</div>
+                    </td>
+                    <td class='header-report-badge'>
+                        <div class='report-badge-title' style='color: #b91c1c; background-color: #fee2e2; border-color: #fecaca;'>Relatório de Pendências</div>
+                        <div class='report-date'>Emitido em: {$dataHora}</div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class='report-intro' style='border-left-color: #dc2626;'>
+            Atenção: Abaixo estão listados todos os <strong>empréstimos em atraso / pendentes de devolução</strong>.
+        </div>
+
+        <table class='data-table'>
+            <thead>
+                <tr style='background-color: #b91c1c;'>
+                    <th style='background-color: #b91c1c; border-color: #b91c1c; width: 35%;'>Título do Livro</th>
+                    <th style='background-color: #b91c1c; border-color: #b91c1c; width: 28%;'>Leitor (Aluno / Professor)</th>
+                    <th style='background-color: #b91c1c; border-color: #b91c1c; width: 17%;'>Turma / Vínculo</th>
+                    <th class='center' style='background-color: #b91c1c; border-color: #b91c1c; width: 20%;'>Venceu em</th>
                 </tr>
             </thead>
             <tbody>";
 
     while ($row = $res->fetch_object()) {
+        $turma = !empty($row->AnoTurma) ? $row->AnoTurma . 'º ' . $row->Turma : $row->Turma;
+
         $html .= "<tr>";
-        $html .= "<td>" . $row->Livro . "</td>";
-        $html .= "<td>" . ($row->Leitor ? $row->Leitor : $row->Professor) . "</td>";
-        $html .= "<td>" . $row->Turma . "</td>";
-        $html .= "<td>";
-
-        if (isset($row->DataDevolucao)) {
-            $html .= $row->DataDevolucao;
-        } else {
-            $html .= "Data não disponível";
-        }
-
-        $html .= "</td>";
-
-
+        $html .= "<td><strong>" . htmlspecialchars($row->Livro) . "</strong></td>";
+        $html .= "<td>" . htmlspecialchars($row->Leitor) . "</td>";
+        $html .= "<td>" . htmlspecialchars($turma) . "</td>";
+        $html .= "<td class='center'><span class='badge-status badge-pendente'>" . htmlspecialchars($row->DataDevolucaoFmt) . "</span></td>";
         $html .= "</tr>";
     }
 
     $html .= "</tbody>
         </table>
-        <div class='footer'>
-        Governo do Estado do Ceará - Educação e Leitura
+
+        <div class='footer-wrapper'>
+            <table class='footer-table'>
+                <tr>
+                    <td>Governo do Estado do Ceará &bull; Secretaria da Educação &bull; EducaBiblio</td>
+                    <td class='footer-right'>Relatório Institucional de Pendências</td>
+                </tr>
+            </table>
         </div>
     </body>
     </html>";
 } else {
-    $html = 'Não há dados a serem exibidos.';
+    $html = "<div style='font-family: Arial; padding: 20px; text-align: center; color: #2e7d32;'><h3>Parabéns! Não há empréstimos pendentes ou em atraso.</h3></div>";
 }
 
 use Dompdf\Dompdf;
@@ -129,13 +94,8 @@ use Dompdf\Dompdf;
 require_once 'dompdf/autoload.inc.php';
 
 $dompdf = new Dompdf();
-
 $dompdf->loadHtml($html);
-
-$dompdf->set_option('defaultFont', 'sans');
-
-$dompdf->setPaper('A4', 'landscape');
-
+$dompdf->set_option('defaultFont', 'Helvetica');
+$dompdf->setPaper('A4', 'portrait');
 $dompdf->render();
-
-$dompdf->stream("Tabela de devolução", array("Attachment" => false));
+$dompdf->stream("Relatorio_Pendencias.pdf", array("Attachment" => false));

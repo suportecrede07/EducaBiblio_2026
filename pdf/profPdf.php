@@ -11,97 +11,73 @@ FROM prof";
 $res = $conn->query($sql);
 
 if ($res->num_rows > 0) {
+    $dataHora = date('d/m/Y H:i');
+    $css = file_get_contents('../CSS/relatorios.css');
+
     $html = "<html>
     <head>
-    <title>EducaBiblio</title>
+        <meta charset='UTF-8'>
+        <title>EducaBiblio - Relatório de Professores</title>
         <style>
-            body {
-                font-family: 'Arial', sans-serif;
-                margin: 0;
-                padding: 0;
-            }
-            h1 {
-                text-align: center;
-                color: #ffffff;
-                margin-bottom: 20px;
-                background-color: rgba(76,175,80); 
-                padding: 10px; 
-            }
-            #library-info {
-                text-align: center;
-                margin: 20px 0;
-            }
-            table {
-                border-collapse: collapse;
-                width: 100%;
-                margin-top: 20px;
-                background-color: #fff;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            }
-            th, td {
-                border: 1px solid #333;
-                padding: 12px;
-                text-align: center;
-            }
-            th {
-                background-color: #4CAF50;
-                color: white;
-                font-weight: bolder;
-            }
-            tbody tr:nth-child(even) {
-                background-color: #f2f2f2; /* Light Gray */
-            }
-            tbody tr:nth-child(odd) {
-                background-color: #fff; /* White */
-            }
-            .footer {
-                position: fixed;
-                bottom: 0;
-                width: 100%;
-                text-align: center;
-                background-color: #4CAF50;
-                color: white;
-                padding: 10px;
-                font-weight: bold;
-            }
+            $css
         </style>
     </head>
     <body>
-        <div id='library-info'>
-            <h1>Tabela de Professores</h1>
-            <p>
-                Bem-vindo ao EducaBiblio, o seu sistema de biblioteca dedicado à promoção da educação e leitura! Abaixo, apresentamos os registros dos professores cadastrados.
-            </p>
+        <div class='header-wrapper'>
+            <table class='header-table'>
+                <tr>
+                    <td class='header-title-box'>
+                        <div class='header-system-name'>EducaBiblio</div>
+                        <div class='header-subtitle'>Sistema de Gestão Bibliotecária e Leitura</div>
+                    </td>
+                    <td class='header-report-badge'>
+                        <div class='report-badge-title'>Relatório de Professores</div>
+                        <div class='report-date'>Emitido em: {$dataHora}</div>
+                    </td>
+                </tr>
+            </table>
         </div>
-        <table>
+
+        <div class='report-intro'>
+            Abaixo estão listados todos os <strong>professores cadastrados</strong> no sistema e suas respectivas disciplinas de atuação.
+        </div>
+
+        <table class='data-table'>
             <thead>
                 <tr>
-                <th>Nome</th>
-                <th>Contato</th>
-                <th>Disciplina</th>
+                    <th style='width: 40%;'>Nome do Professor</th>
+                    <th style='width: 35%;'>Contato / E-mail</th>
+                    <th style='width: 25%;'>Disciplina</th>
                 </tr>
             </thead>
             <tbody>";
 
     while ($row = $res->fetch_object()) {
+        $email = !empty($row->EmailProf) ? $row->EmailProf : '-';
+        $materia = !empty($row->MateriaProf) ? $row->MateriaProf : '-';
+
         $html .= "<tr>";
-        $html .= "<td>" . $row->NomeProf . "</td>";
-        $html .= "<td>" . $row->EmailProf . "</td>";
-        $html .= "<td>" . $row->MateriaProf . "</td>";
-
-
+        $html .= "<td><strong>" . htmlspecialchars($row->NomeProf) . "</strong></td>";
+        $html .= "<td>" . htmlspecialchars($email) . "</td>";
+        $html .= "<td>" . htmlspecialchars($materia) . "</td>";
         $html .= "</tr>";
     }
 
     $html .= "</tbody>
         </table>
-        <div class='footer'>
-        Governo do Estado do Ceará - Educação e Leitura
+
+        <div class='footer-wrapper'>
+            <table class='footer-table'>
+                <tr>
+                    <td>Governo do Estado do Ceará &bull; Secretaria da Educação &bull; EducaBiblio</td>
+                    <td class='footer-right'>Relatório Institucional de Professores</td>
+                </tr>
+            </table>
         </div>
     </body>
     </html>";
 } else {
-    $html = 'Não há dados a serem exibidos.';
+    $html = "<div style='font-family: Arial; padding: 20px; text-align: center; color: #666;'><h3>Não há professores cadastrados a serem exibidos.</h3></div>";
 }
 
 use Dompdf\Dompdf;
@@ -109,13 +85,8 @@ use Dompdf\Dompdf;
 require_once 'dompdf/autoload.inc.php';
 
 $dompdf = new Dompdf();
-
 $dompdf->loadHtml($html);
-
-$dompdf->set_option('defaultFont', 'sans');
-
-$dompdf->setPaper('A4', 'landscape');
-
+$dompdf->set_option('defaultFont', 'Helvetica');
+$dompdf->setPaper('A4', 'portrait');
 $dompdf->render();
-
-$dompdf->stream("Tabela de leitores", array("Attachment" => false));
+$dompdf->stream("Relatorio_Professores.pdf", array("Attachment" => false));
