@@ -293,12 +293,41 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     z-index: 500;
     padding-bottom: 20px;
     box-sizing: content-box;
+    overflow: hidden;
 }
 
 #sidebar .brand .fas {
     min-width: 60px;
     display: flex;
     justify-content: center;
+}
+
+#sidebar .brand .text {
+    white-space: nowrap;
+    opacity: 1;
+    transition: opacity 0.2s ease;
+}
+
+#sidebar.hide .brand .text {
+    opacity: 0;
+    pointer-events: none;
+}
+
+#sidebar.hide .side-menu li#li-toggle-sidebar a .fas {
+    transform: rotate(180deg);
+}
+
+#sidebar .side-menu li#li-toggle-sidebar a {
+    color: var(--cinzaIntermediário);
+    transition: color 0.2s ease, background 0.2s ease;
+}
+
+#sidebar .side-menu li#li-toggle-sidebar a:hover {
+    color: var(--verdePrincipal);
+}
+
+#sidebar.hide .side-menu li#li-toggle-sidebar a {
+    background: transparent;
 }
 
 #sidebar .side-menu {
@@ -687,61 +716,207 @@ button.pdf-button:active {
 
 #content main .box-info {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    grid-gap: 24px;
-    margin-top: 36px;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    grid-gap: 16px;
+    margin-top: 32px;
 }
 
 #content main .box-info li {
-    padding: 24px;
-    background: var(--light);
+    padding: 24px 22px;
+    background: #ffffff;
     border-radius: 20px;
     display: flex;
-    align-items: center;
-    grid-gap: 24px;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 160px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-#content main .box-info li .fas {
-    width: 80px;
-    height: 80px;
-    border-radius: 10px;
-    font-size: 36px;
+#content main .box-info li .card-top {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+}
+
+#content main .box-info li .card-title-group {
+    display: flex;
+    flex-direction: column;
+}
+
+#content main .box-info li .card-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.9px;
+    color: #8f96a3;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    font-family: var(--poppins);
+}
+
+#content main .box-info li .card-number {
+    font-size: 38px;
+    font-weight: 800;
+    color: #111827;
+    line-height: 1;
+    font-family: var(--poppins);
+}
+
+#content main .box-info li .card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
     align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
 }
 
-#content main .box-info li:nth-child(1) .fas {
-    background: var(--verdeClaro);
-    color: var(--verdePrincipal);
+/* Ícones Light Mode */
+#content main .box-info li .card-icon-green {
+    background: #eaf8ec;
+    color: #00c067;
 }
 
-#content main .box-info li:nth-child(2) .fas {
-    background: var(--amareloClaro);
-    color: var(--amarelo);
+#content main .box-info li .card-icon-yellow {
+    background: #fdf6e7;
+    color: #f59e0b;
 }
 
-#content main .box-info li:nth-child(3) .fas {
-    background: var(--laranjaClaro);
-    color: var(--laranja);
+#content main .box-info li .card-icon-orange {
+    background: #fdf0e7;
+    color: #f97316;
 }
 
-#content main .box-info li:nth-child(4) .fas {
-    background: var(--azulClaro);
-    color: var(--azul);
+#content main .box-info li .card-icon-purple {
+    background: #edeafb;
+    color: #6366f1;
 }
 
-#content main .box-info li .text h3 {
-    font-size: 25px;
-    color: var(--cinzaEscuro);
-    font-weight: bold;
+/* Rodapé do Card */
+#content main .box-info li .card-bottom {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
+    font-size: 13px;
 }
 
-#content main .box-info li .text p {
-    color: var(--cinzaEscuro);
-    font-weight: normal;
-    font-size: 15px;
-    margin-top: 5px;
+#content main .box-info li .card-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 11px;
+    font-family: var(--poppins);
+}
+
+#content main .box-info li .tag-green {
+    background: #e6f9ed;
+    color: #00c067;
+}
+
+#content main .box-info li .tag-orange {
+    background: #fef0e7;
+    color: #ea580c;
+}
+
+#content main .box-info li .tag-purple {
+    background: #eeedfc;
+    color: #6366f1;
+}
+
+#content main .box-info li .card-subtext {
+    color: #8b93a0;
+    font-size: 12.5px;
+    font-weight: 500;
+}
+
+/* ==========================================================
+   ESTILIZAÇÃO DOS CARDS NO MODO ESCURO — CÓPIA EXATA DA REFERÊNCIA
+   ========================================================== */
+body.dark #content main .box-info li {
+    background: #0f1523;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 20px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+/* Brilho sutil colorido no canto inferior de cada card igual na imagem */
+body.dark #content main .box-info li.card-alunos {
+    background: radial-gradient(circle at bottom right, rgba(0, 192, 103, 0.08) 0%, #0f1523 60%);
+}
+
+body.dark #content main .box-info li.card-emprestimos {
+    background: radial-gradient(circle at bottom right, rgba(245, 158, 11, 0.06) 0%, #0f1523 60%);
+}
+
+body.dark #content main .box-info li.card-pendencias {
+    background: radial-gradient(circle at bottom right, rgba(249, 115, 22, 0.07) 0%, #0f1523 60%);
+}
+
+body.dark #content main .box-info li.card-acervo {
+    background: radial-gradient(circle at bottom right, rgba(99, 102, 241, 0.08) 0%, #0f1523 60%);
+}
+
+body.dark #content main .box-info li .card-label {
+    color: #798399;
+}
+
+body.dark #content main .box-info li .card-number {
+    color: #ffffff;
+}
+
+/* Ícones Dark Mode estilo pílula escura com borda suave */
+body.dark #content main .box-info li .card-icon-green {
+    background: #07261d;
+    border: 1px solid #0d4a37;
+    color: #00d26a;
+}
+
+body.dark #content main .box-info li .card-icon-yellow {
+    background: #34200c;
+    border: 1px solid #5a3814;
+    color: #ffb72b;
+}
+
+body.dark #content main .box-info li .card-icon-orange {
+    background: #351a13;
+    border: 1px solid #5c2b1e;
+    color: #ff7843;
+}
+
+body.dark #content main .box-info li .card-icon-purple {
+    background: #1e1b4b;
+    border: 1px solid #3730a3;
+    color: #818cf8;
+}
+
+/* Tags Dark Mode estilo badge cápsula */
+body.dark #content main .box-info li .tag-green {
+    background: rgba(0, 210, 106, 0.12);
+    color: #00d26a;
+}
+
+body.dark #content main .box-info li .tag-orange {
+    background: rgba(255, 120, 67, 0.18);
+    color: #ff8452;
+}
+
+body.dark #content main .box-info li .tag-purple {
+    background: rgba(129, 140, 248, 0.18);
+    color: #939ffb;
+}
+
+body.dark #content main .box-info li .card-subtext {
+    color: #7d859b;
 }
 
 #sidebar {
@@ -908,7 +1083,111 @@ table.dataTable td.dt-type-date {
     margin-bottom: 0;
 }
 
-/* Botão de Editar padronizado e aprimorado com contorno dourado/amarelo */
+/* ==========================================================
+   BOTÃO DE VISUALIZAR / HISTÓRICO (AZUL / SOFT TINT GLOW)
+   ========================================================== */
+.btn-outline-primary,
+button.btn-outline-primary,
+a .btn-outline-primary {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    max-width: 36px !important;
+    padding: 0 !important;
+    background-color: #eff6ff !important;
+    background-image: none !important;
+    border: 1.5px solid #bfdbfe !important;
+    border-radius: 10px !important;
+    color: #2563eb !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+    margin: 0 4px !important;
+    box-shadow: 0 1px 3px rgba(37, 99, 235, 0.12) !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-sizing: border-box !important;
+}
+
+.btn-outline-primary i,
+.btn-outline-primary .fas,
+.btn-outline-primary .fa,
+button.btn-outline-primary i,
+button.btn-outline-primary .fas,
+button.btn-outline-primary .fa {
+    color: #2563eb !important;
+    font-size: 14px !important;
+    transition: color 0.2s ease, transform 0.2s ease !important;
+}
+
+.btn-outline-primary:hover,
+button.btn-outline-primary:hover {
+    background-color: #3b82f6 !important;
+    border-color: #3b82f6 !important;
+    color: #ffffff !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3) !important;
+}
+
+.btn-outline-primary:hover i,
+.btn-outline-primary:hover .fas,
+.btn-outline-primary:hover .fa,
+button.btn-outline-primary:hover i,
+button.btn-outline-primary:hover .fas,
+button.btn-outline-primary:hover .fa {
+    color: #ffffff !important;
+    transform: scale(1.15) !important;
+}
+
+.btn-outline-primary:active,
+button.btn-outline-primary:active {
+    transform: translateY(0) scale(0.95) !important;
+    box-shadow: 0 1px 3px rgba(37, 99, 235, 0.2) !important;
+}
+
+/* Modo Escuro (body.dark) para Visualizar/Histórico */
+body.dark .btn-outline-primary,
+body.dark button.btn-outline-primary,
+body.dark a .btn-outline-primary {
+    background-color: rgba(59, 130, 246, 0.14) !important;
+    border: 1.5px solid rgba(59, 130, 246, 0.38) !important;
+    color: #60a5fa !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) !important;
+}
+
+body.dark .btn-outline-primary i,
+body.dark .btn-outline-primary .fas,
+body.dark .btn-outline-primary .fa,
+body.dark button.btn-outline-primary i,
+body.dark button.btn-outline-primary .fas,
+body.dark button.btn-outline-primary .fa {
+    color: #60a5fa !important;
+}
+
+body.dark .btn-outline-primary:hover,
+body.dark button.btn-outline-primary:hover {
+    background-color: #3b82f6 !important;
+    border-color: #60a5fa !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 14px rgba(59, 130, 246, 0.45) !important;
+    transform: translateY(-2px) !important;
+}
+
+body.dark .btn-outline-primary:hover i,
+body.dark .btn-outline-primary:hover .fas,
+body.dark .btn-outline-primary:hover .fa,
+body.dark button.btn-outline-primary:hover i,
+body.dark button.btn-outline-primary:hover .fas,
+body.dark button.btn-outline-primary:hover .fa {
+    color: #ffffff !important;
+}
+
+/* ==========================================================
+   BOTÃO DE EDITAR (OPÇÃO 1: SOFT TINT / GLOW TRANSLÚCIDO)
+   ========================================================== */
 .btn-outline-warning,
 .edit-button,
 button.btn-outline-warning,
@@ -920,11 +1199,11 @@ a .edit-button {
     min-width: 36px !important;
     max-width: 36px !important;
     padding: 0 !important;
-    background-color: transparent !important;
+    background-color: #fef3c7 !important;
     background-image: none !important;
-    border: 1.5px solid #f59e0b !important;
-    border-radius: 8px !important;
-    color: #f59e0b !important;
+    border: 1.5px solid #fde68a !important;
+    border-radius: 10px !important;
+    color: #d97706 !important;
     cursor: pointer !important;
     display: inline-flex !important;
     justify-content: center !important;
@@ -933,8 +1212,8 @@ a .edit-button {
     font-weight: 600 !important;
     text-align: center !important;
     margin: 0 4px !important;
-    box-shadow: 0 1px 3px rgba(245, 158, 11, 0.1) !important;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 1px 3px rgba(245, 158, 11, 0.12) !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
     box-sizing: border-box !important;
 }
 
@@ -946,7 +1225,7 @@ button.btn-outline-warning i,
 button.btn-outline-warning .fas,
 button.edit-button i,
 button.edit-button .fas {
-    color: #f59e0b !important;
+    color: #d97706 !important;
     font-size: 14px !important;
     transition: color 0.2s ease, transform 0.2s ease !important;
 }
@@ -959,7 +1238,7 @@ button.edit-button:hover {
     border-color: #f59e0b !important;
     color: #ffffff !important;
     transform: translateY(-2px) !important;
-    box-shadow: 0 4px 8px rgba(245, 158, 11, 0.28) !important;
+    box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3) !important;
 }
 
 .btn-outline-warning:hover i,
@@ -971,15 +1250,61 @@ button.btn-outline-warning:hover .fas,
 button.edit-button:hover i,
 button.edit-button:hover .fas {
     color: #ffffff !important;
-    transform: rotate(5deg) !important;
+    transform: rotate(8deg) scale(1.1) !important;
 }
 
 .btn-outline-warning:active,
 .edit-button:active,
 button.btn-outline-warning:active,
 button.edit-button:active {
-    transform: translateY(0) scale(0.96) !important;
-    box-shadow: 0 2px 4px rgba(245, 158, 11, 0.2) !important;
+    transform: translateY(0) scale(0.95) !important;
+    box-shadow: 0 1px 3px rgba(245, 158, 11, 0.2) !important;
+}
+
+/* Modo Escuro (body.dark) */
+body.dark .btn-outline-warning,
+body.dark .edit-button,
+body.dark button.btn-outline-warning,
+body.dark button.edit-button,
+body.dark a .btn-outline-warning,
+body.dark a .edit-button {
+    background-color: rgba(245, 158, 11, 0.14) !important;
+    border: 1.5px solid rgba(245, 158, 11, 0.38) !important;
+    color: #fbbf24 !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) !important;
+}
+
+body.dark .btn-outline-warning i,
+body.dark .btn-outline-warning .fas,
+body.dark .edit-button i,
+body.dark .edit-button .fas,
+body.dark button.btn-outline-warning i,
+body.dark button.btn-outline-warning .fas,
+body.dark button.edit-button i,
+body.dark button.edit-button .fas {
+    color: #fbbf24 !important;
+}
+
+body.dark .btn-outline-warning:hover,
+body.dark .edit-button:hover,
+body.dark button.btn-outline-warning:hover,
+body.dark button.edit-button:hover {
+    background-color: #f59e0b !important;
+    border-color: #fbbf24 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 14px rgba(245, 158, 11, 0.45) !important;
+    transform: translateY(-2px) !important;
+}
+
+body.dark .btn-outline-warning:hover i,
+body.dark .btn-outline-warning:hover .fas,
+body.dark .edit-button:hover i,
+body.dark .edit-button:hover .fas,
+body.dark button.btn-outline-warning:hover i,
+body.dark button.btn-outline-warning:hover .fas,
+body.dark button.edit-button:hover i,
+body.dark button.edit-button:hover .fas {
+    color: #ffffff !important;
 }
 
 /* Incrementando botão de renovação */
@@ -1006,27 +1331,126 @@ button.edit-button:active {
     background-color: var(--azulForte);
 }
 
-.delete-button {
-    width: 40px;
-    background-color: var(--vermelho);
-    border: none;
-    outline: none;
-    border-radius: 10px;
-    outline: none;
-    height: 30px;
-    color: #fff;
-    cursor: pointer;
-    transition: 0.6s;
-    display: block;
-    font-size: 12px;
-    font-weight: bold;
-    text-align: center;
-    margin-left: 10px;
+/* ==========================================================
+   BOTÃO DE EXCLUIR (OPÇÃO 1: SOFT TINT / GLOW TRANSLÚCIDO)
+   ========================================================== */
+.delete-button,
+.btn-outline-danger:not(#pdf-button),
+button.delete-button,
+button.btn-outline-danger:not(#pdf-button),
+a .delete-button,
+a .btn-outline-danger:not(#pdf-button) {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    max-width: 36px !important;
+    padding: 0 !important;
+    background-color: #fee2e2 !important;
+    background-image: none !important;
+    border: 1.5px solid #fecaca !important;
+    border-radius: 10px !important;
+    color: #dc2626 !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+    margin: 0 4px !important;
+    box-shadow: 0 1px 3px rgba(220, 38, 38, 0.12) !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-sizing: border-box !important;
 }
 
-.delete-button:hover {
-    background-position: right;
-    background-color: #ca1111;
+.delete-button i,
+.delete-button .fas,
+.btn-outline-danger:not(#pdf-button) i,
+.btn-outline-danger:not(#pdf-button) .fas,
+button.delete-button i,
+button.delete-button .fas,
+button.btn-outline-danger:not(#pdf-button) i,
+button.btn-outline-danger:not(#pdf-button) .fas {
+    color: #dc2626 !important;
+    font-size: 14px !important;
+    transition: color 0.2s ease, transform 0.2s ease !important;
+}
+
+.delete-button:hover,
+.btn-outline-danger:not(#pdf-button):hover,
+button.delete-button:hover,
+button.btn-outline-danger:not(#pdf-button):hover {
+    background-color: #ef4444 !important;
+    border-color: #ef4444 !important;
+    color: #ffffff !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3) !important;
+}
+
+.delete-button:hover i,
+.delete-button:hover .fas,
+.btn-outline-danger:not(#pdf-button):hover i,
+.btn-outline-danger:not(#pdf-button):hover .fas,
+button.delete-button:hover i,
+button.delete-button:hover .fas,
+button.btn-outline-danger:not(#pdf-button):hover i,
+button.btn-outline-danger:not(#pdf-button):hover .fas {
+    color: #ffffff !important;
+    transform: rotate(-8deg) scale(1.1) !important;
+}
+
+.delete-button:active,
+.btn-outline-danger:not(#pdf-button):active,
+button.delete-button:active,
+button.btn-outline-danger:not(#pdf-button):active {
+    transform: translateY(0) scale(0.95) !important;
+    box-shadow: 0 1px 3px rgba(239, 68, 68, 0.2) !important;
+}
+
+/* Modo Escuro (body.dark) para Excluir */
+body.dark .delete-button,
+body.dark .btn-outline-danger:not(#pdf-button),
+body.dark button.delete-button,
+body.dark button.btn-outline-danger:not(#pdf-button),
+body.dark a .delete-button,
+body.dark a .btn-outline-danger:not(#pdf-button) {
+    background-color: rgba(239, 68, 68, 0.14) !important;
+    border: 1.5px solid rgba(239, 68, 68, 0.38) !important;
+    color: #f87171 !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) !important;
+}
+
+body.dark .delete-button i,
+body.dark .delete-button .fas,
+body.dark .btn-outline-danger:not(#pdf-button) i,
+body.dark .btn-outline-danger:not(#pdf-button) .fas,
+body.dark button.delete-button i,
+body.dark button.delete-button .fas,
+body.dark button.btn-outline-danger:not(#pdf-button) i,
+body.dark button.btn-outline-danger:not(#pdf-button) .fas {
+    color: #f87171 !important;
+}
+
+body.dark .delete-button:hover,
+body.dark .btn-outline-danger:not(#pdf-button):hover,
+body.dark button.delete-button:hover,
+body.dark button.btn-outline-danger:not(#pdf-button):hover {
+    background-color: #ef4444 !important;
+    border-color: #f87171 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 14px rgba(239, 68, 68, 0.45) !important;
+    transform: translateY(-2px) !important;
+}
+
+body.dark .delete-button:hover i,
+body.dark .delete-button:hover .fas,
+body.dark .btn-outline-danger:not(#pdf-button):hover i,
+body.dark .btn-outline-danger:not(#pdf-button):hover .fas,
+body.dark button.delete-button:hover i,
+body.dark button.delete-button:hover .fas,
+body.dark button.btn-outline-danger:not(#pdf-button):hover i,
+body.dark button.btn-outline-danger:not(#pdf-button):hover .fas {
+    color: #ffffff !important;
 }
 
 .historico-button {
@@ -1533,7 +1957,7 @@ h4 {
 
 
 
-/* Incrementando input date 
+/* Incrementando input date */ 
 
 *,
 *:before,
@@ -1558,4 +1982,190 @@ input[type="date"]{
     cursor: pointer;
     border-radius: 3px;
 }
-*/
+
+/* ==========================================================
+   BOTÕES DE STATUS DO EMPRÉSTIMO (SEGMENTED CONTROL MODERNO)
+   ========================================================== */
+.head-status-acoes {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #f1f3f7;
+    padding: 5px 8px;
+    border-radius: 30px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.head-status-acoes .status-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748b;
+    margin-right: 4px;
+    margin-left: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    line-height: 1;
+    border: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Modo Claro */
+.btn-status-ativos {
+    background: #ffffff;
+    color: #d97706 !important;
+    border: 1.5px solid #fde68a;
+}
+.btn-status-ativos:hover {
+    background: #d97706;
+    color: #ffffff !important;
+    border-color: #d97706;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);
+}
+
+.btn-status-pendentes {
+    background: #ffffff;
+    color: #dc2626 !important;
+    border: 1.5px solid #fecaca;
+}
+.btn-status-pendentes:hover {
+    background: #dc2626;
+    color: #ffffff !important;
+    border-color: #dc2626;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+}
+
+.btn-status-devolvidos {
+    background: #ffffff;
+    color: #059669 !important;
+    border: 1.5px solid #a7f3d0;
+}
+.btn-status-devolvidos:hover {
+    background: #059669;
+    color: #ffffff !important;
+    border-color: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+}
+
+/* Modo Escuro (body.dark) */
+body.dark .head-status-acoes {
+    background: #0f1523;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+body.dark .head-status-acoes .status-label {
+    color: #94a3b8;
+}
+
+body.dark .btn-status-ativos {
+    background: rgba(245, 158, 11, 0.12);
+    color: #fbbf24 !important;
+    border: 1.5px solid rgba(245, 158, 11, 0.35);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+body.dark .btn-status-ativos:hover {
+    background: #f59e0b;
+    color: #ffffff !important;
+    border-color: #f59e0b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+}
+
+body.dark .btn-status-pendentes {
+    background: rgba(239, 68, 68, 0.12);
+    color: #f87171 !important;
+    border: 1.5px solid rgba(239, 68, 68, 0.35);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+body.dark .btn-status-pendentes:hover {
+    background: #ef4444;
+    color: #ffffff !important;
+    border-color: #ef4444;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+}
+
+body.dark .btn-status-devolvidos {
+    background: rgba(16, 185, 129, 0.12);
+    color: #34d399 !important;
+    border: 1.5px solid rgba(16, 185, 129, 0.35);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+body.dark .btn-status-devolvidos:hover {
+    background: #10b981;
+    color: #ffffff !important;
+    border-color: #10b981;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+}
+body.dark .dataTables_wrapper,
+body.dark div.dt-container {
+    color: var(--cinzaEscuro) !important;
+}
+
+body.dark .dataTables_wrapper .dataTables_length,
+body.dark .dataTables_wrapper .dataTables_filter,
+body.dark .dataTables_wrapper .dataTables_info,
+body.dark .dataTables_wrapper .dataTables_paginate,
+body.dark div.dt-container .dt-search,
+body.dark div.dt-container .dt-length,
+body.dark div.dt-container .dt-info,
+body.dark div.dt-container .dt-paging {
+    color: var(--cinzaEscuro) !important;
+}
+
+body.dark .dataTables_wrapper .dataTables_length select,
+body.dark .dataTables_wrapper .dataTables_filter input,
+body.dark div.dt-container .dt-search input,
+body.dark div.dt-container .dt-length select {
+    background-color: #141926 !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: #fff !important;
+    border-radius: 6px;
+    padding: 4px 8px;
+    outline: none;
+}
+
+body.dark .dataTables_wrapper .dataTables_paginate .paginate_button,
+body.dark div.dt-container .dt-paging .dt-paging-button {
+    color: #aaa !important;
+}
+
+body.dark .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+body.dark .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover,
+body.dark div.dt-container .dt-paging .dt-paging-button.current {
+    background: var(--verdePrincipal) !important;
+    color: #fff !important;
+    border: 1px solid var(--verdePrincipal) !important;
+    border-radius: 6px;
+}
+
+body.dark .dataTables_wrapper .dataTables_paginate .paginate_button:hover,
+body.dark div.dt-container .dt-paging .dt-paging-button:hover {
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #fff !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 6px;
+}
+
+body.dark .dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+body.dark div.dt-container .dt-paging .dt-paging-button.disabled {
+    color: #555 !important;
+    cursor: default;
+}

@@ -97,7 +97,13 @@ $conn = $conexao->getConnection();
             </li>
         </ul>
         <ul class="side-menu">
-            <li>
+            <li id='li-toggle-sidebar'>
+				<a href='#' id='btn-toggle-sidebar' style='cursor: pointer;'>
+					<i class='fas fa-chevron-left'></i>
+					<span class='text'>Recolher menu</span>
+				</a>
+			</li>
+			<li>
                 <a href="../Controller/CLogout.php" class="logout">
                     <i class="fas fa-sign-out-alt"></i>
                     <span class="text">Deslogar</span>
@@ -108,7 +114,6 @@ $conn = $conexao->getConnection();
 
     <section id="content">
         <nav>
-            <i class='fas fa-bars'></i>
             <form action="#"></form>
 
             <div class="icons">

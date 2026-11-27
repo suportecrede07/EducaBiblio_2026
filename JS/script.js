@@ -1,11 +1,14 @@
-// Seleciona todos os elementos âncora (links) dentro de <li> elementos dentro do elemento com ID 'sidebar'
-const allSideMenu = document.querySelectorAll("#sidebar .side-menu.top li a");
+// Seleciona todos os elementos âncora (links) de navegação dentro do menu lateral
+const allSideMenu = document.querySelectorAll("#sidebar .side-menu.top li:not(#li-toggle-sidebar) a");
 
 // Para cada link no menu lateral, adiciona um ouvinte de eventos de clique
 allSideMenu.forEach((item) => {
     const li = item.parentElement;
 
     item.addEventListener("click", function() {
+        // Ignora caso seja o botão de alternar sidebar
+        if (li.id === 'li-toggle-sidebar') return;
+
         // Remove a classe 'active' de todos os itens do menu lateral
         allSideMenu.forEach((i) => {
             i.parentElement.classList.remove("active");
@@ -16,9 +19,10 @@ allSideMenu.forEach((item) => {
 });
 
 // HIDE MENU LATERAL
-// Seleciona o ícone de barra de menu no conteúdo e o elemento sidebar
-const menuBar = document.querySelector("#content nav .fas.fa-bars");
+// Seleciona o botão lateral, o ícone da navbar (se houver) e a sidebar
 const sidebar = document.getElementById("sidebar");
+const btnToggleSidebar = document.getElementById("btn-toggle-sidebar");
+const menuBar = document.querySelector("#content nav .fas.fa-bars");
 
 // Função para alternar a classe 'hide' no elemento sidebar
 function toggleSidebar() {
@@ -31,8 +35,18 @@ function toggleSidebar() {
     localStorage.setItem("sidebarHidden", JSON.stringify(isSidebarHidden));
 }
 
-// Adiciona um ouvinte de evento de clique ao ícone de barra de menu
-menuBar.addEventListener("click", toggleSidebar);
+// Adiciona ouvinte de clique ao botão na própria barra lateral
+if (btnToggleSidebar) {
+    btnToggleSidebar.addEventListener("click", function(e) {
+        e.preventDefault();
+        toggleSidebar();
+    });
+}
+
+// Mantém suporte caso clique na navbar superior também
+if (menuBar) {
+    menuBar.addEventListener("click", toggleSidebar);
+}
 
 // Recupera o estado armazenado no localStorage ao carregar a página
 document.addEventListener("DOMContentLoaded", function() {

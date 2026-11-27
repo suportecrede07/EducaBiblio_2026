@@ -159,6 +159,12 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 			</li>
 		</ul>
 		<ul class="side-menu">
+			<li id='li-toggle-sidebar'>
+				<a href='#' id='btn-toggle-sidebar' style='cursor: pointer;'>
+					<i class='fas fa-chevron-left'></i>
+					<span class='text'>Recolher menu</span>
+				</a>
+			</li>
 			<li>
 				<a href="../Controller/CLogout.php" class="logout">
 					<i class="fas fa-sign-out-alt"></i>
@@ -170,7 +176,6 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 
 	<section id="content">
 		<nav>
-			<i class='fas fa-bars'></i>
 			<form action="#"></form>
 
 			<div class="icons">
@@ -256,6 +261,37 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 				.order table td {
 					text-align: left !important;
 					vertical-align: middle !important;
+					padding: 14px 16px !important;
+				}
+
+				.order table th:nth-child(5),
+				.order table td:nth-child(5),
+				.order table th:nth-child(6),
+				.order table td:nth-child(6),
+				.order table th:nth-child(7),
+				.order table td:nth-child(7) {
+					text-align: center !important;
+					width: 80px;
+				}
+
+				.order table th:nth-child(1),
+				.order table td:nth-child(1) {
+					width: 25%;
+				}
+
+				.order table th:nth-child(2),
+				.order table td:nth-child(2) {
+					width: 8%;
+				}
+
+				.order table th:nth-child(3),
+				.order table td:nth-child(3) {
+					width: 15%;
+				}
+
+				.order table th:nth-child(4),
+				.order table td:nth-child(4) {
+					width: 28%;
 				}
 			</style>
 			<main>
@@ -281,7 +317,6 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 							</script>
 
 						</div>
-						<table>
 
 							<?php
 							$conexao = new CConexao();

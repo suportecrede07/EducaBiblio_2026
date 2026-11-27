@@ -118,6 +118,12 @@ $conn = $conexao->getConnection();
 			</li>
 		</ul>
 		<ul class="side-menu">
+			<li id='li-toggle-sidebar'>
+				<a href='#' id='btn-toggle-sidebar' style='cursor: pointer;'>
+					<i class='fas fa-chevron-left'></i>
+					<span class='text'>Recolher menu</span>
+				</a>
+			</li>
 			<li>
 				<a href="../Controller/CLogout.php" class="logout">
 					<i class="fas fa-sign-out-alt"></i>
@@ -129,7 +135,6 @@ $conn = $conexao->getConnection();
 
 	<section id="content">
 		<nav>
-			<i class='fas fa-bars'></i>
 			<form action="#"></form>
 			<div class="icons">
 				<div id="menu-btn" class="fas fa-question" onclick="abrirPDFEmNovaAba()"></div>
@@ -207,10 +212,11 @@ $conn = $conexao->getConnection();
 							<button type="button" class="btn-cadastrar-emp" data-bs-toggle="modal" data-bs-target="#cadEmpModal">
 								<i class="fas fa-plus"></i> Novo Empréstimo
 							</button>
+						</div>
 
-							<span id="msgAlerta"></span>
+						<span id="msgAlerta"></span>
 
-							<table id="TableEmprestimos" class="tabelaEmp">
+						<table id="TableEmprestimos" class="tabelaEmp">
 								<thead>
 									<tr>
 										<th>Livro</th>
@@ -228,7 +234,6 @@ $conn = $conexao->getConnection();
 									</tr>
 								</thead>
 							</table>
-						</div>
 					</div>
 				</div>
 

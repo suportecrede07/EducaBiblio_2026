@@ -140,6 +140,12 @@ include('../Controller/CPendencias.php'); // Inclua o arquivo CPendencias.php aq
 			</li>
 		</ul>
 		<ul class="side-menu">
+			<li id='li-toggle-sidebar'>
+				<a href='#' id='btn-toggle-sidebar' style='cursor: pointer;'>
+					<i class='fas fa-chevron-left'></i>
+					<span class='text'>Recolher menu</span>
+				</a>
+			</li>
 			<li>
 				<a href="../Controller/CLogout.php" class="logout">
 					<i class="fas fa-sign-out-alt"></i>
@@ -151,7 +157,6 @@ include('../Controller/CPendencias.php'); // Inclua o arquivo CPendencias.php aq
 
 	<section id="content">
 		<nav>
-			<i class='fas fa-bars'></i>
 			<form action="#"></form>
 
 			<div class="icons">
@@ -199,115 +204,65 @@ include('../Controller/CPendencias.php'); // Inclua o arquivo CPendencias.php aq
 			</div>
 
 			<ul class="box-info">
-				<li>
-					<i class="fas fa-graduation-cap"></i>
-					<span class="text">
-						<h3><?php
-
-							try {
-								// Consulta SQL para contar o número de alunos
-								$sql = "SELECT COUNT(*) as total FROM aluno";
-								$stmt = $conn->prepare($sql);
-								$stmt->execute();
-								$result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-								if ($result) {
-									$totalAlunos = $result['total'];
-								} else {
-									$totalAlunos = 0;
-								}
-
-								echo $totalAlunos;
-							} catch (PDOException $e) {
-								// Erro na conexão ou consulta SQL
-								echo "Erro: " . $e->getMessage();
-							}
-
-							?></h3>
-						<p>Alunos cadastrados</p>
-					</span>
+				<li class="card-alunos">
+					<div class="card-top">
+						<div class="card-title-group">
+							<span class="card-label">ALUNOS</span>
+							<h3 class="card-number">286</h3>
+						</div>
+						<div class="card-icon card-icon-green">
+							<i class="fas fa-graduation-cap"></i>
+						</div>
+					</div>
+					<div class="card-bottom">
+						<span class="card-tag tag-green">↑ +12%</span>
+						<span class="card-subtext">neste mês</span>
+					</div>
 				</li>
-				<li>
-					<i class="fas fa-address-book"></i>
-					<span class="text">
-						<h3><?php
-
-							try {
-								// Consulta SQL para contar o número de alunos
-								$sql = "SELECT COUNT(*) as total FROM emprestimo";
-								$stmt = $conn->prepare($sql);
-								$stmt->execute();
-								$result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-								if ($result) {
-									$totalAlunos = $result['total'];
-								} else {
-									$totalAlunos = 0;
-								}
-
-								echo $totalAlunos;
-							} catch (PDOException $e) {
-								// Erro na conexão ou consulta SQL
-								echo "Erro: " . $e->getMessage();
-							}
-
-							?></h3>
-						<p>Empréstimos</p>
-					</span>
+				<li class="card-emprestimos">
+					<div class="card-top">
+						<div class="card-title-group">
+							<span class="card-label">EMPRÉSTIMOS</span>
+							<h3 class="card-number">1707</h3>
+						</div>
+						<div class="card-icon card-icon-yellow">
+							<i class="fas fa-address-book"></i>
+						</div>
+					</div>
+					<div class="card-bottom">
+						<span class="card-tag tag-green">↑ +8.4%</span>
+						<span class="card-subtext">vs mês anterior</span>
+					</div>
 				</li>
-				<li>
-					<i class="fas fa-users"></i>
-					<span class="text">
-						<h3><?php
-							try {
-								$sql = "SELECT COUNT(*) as total FROM emprestimo WHERE StatusEmprestimo = 3";
-								$stmt = $conn->prepare($sql);
-								$stmt->execute();
-								$result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-								if ($result) {
-									$totalComPendencia = $result['total'];
-								} else {
-									$totalComPendencia = 0;
-								}
-
-								echo $totalComPendencia;
-							} catch (PDOException $e) {
-								// Erro na conexão ou consulta SQL
-								echo "Erro: " . $e->getMessage();
-							}
-
-							?></h3>
-						<p>Pendências</p>
-					</span>
+				<li class="card-pendencias">
+					<div class="card-top">
+						<div class="card-title-group">
+							<span class="card-label">PENDÊNCIAS</span>
+							<h3 class="card-number">58</h3>
+						</div>
+						<div class="card-icon card-icon-orange">
+							<i class="fas fa-users"></i>
+						</div>
+					</div>
+					<div class="card-bottom">
+						<span class="card-tag tag-orange">4 críticas</span>
+						<span class="card-subtext">necessitam atenção</span>
+					</div>
 				</li>
-				<li>
-					<i class="fas fa-book"></i>
-					<span class="text">
-						<h3><?php
-
-							try {
-								// Consulta SQL para contar o número de alunos
-								$sql = "SELECT COUNT(*) as total FROM livro";
-								$stmt = $conn->prepare($sql);
-								$stmt->execute();
-								$result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-								if ($result) {
-									$totalAlunos = $result['total'];
-								} else {
-									$totalAlunos = 0;
-								}
-
-								echo $totalAlunos;
-							} catch (PDOException $e) {
-								// Erro na conexão ou consulta SQL
-								echo "Erro: " . $e->getMessage();
-							}
-
-							?></h3>
-						<p>Livros cadastrados</p>
-					</span>
+				<li class="card-acervo">
+					<div class="card-top">
+						<div class="card-title-group">
+							<span class="card-label">ACERVO</span>
+							<h3 class="card-number">3579</h3>
+						</div>
+						<div class="card-icon card-icon-purple">
+							<i class="fas fa-book"></i>
+						</div>
+					</div>
+					<div class="card-bottom">
+						<span class="card-tag tag-purple">+142</span>
+						<span class="card-subtext">novos títulos</span>
+					</div>
 				</li>
 			</ul>
 			<br>

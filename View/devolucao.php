@@ -97,7 +97,13 @@ $conn = $conexao->getConnection();
             </li>
         </ul>
         <ul class="side-menu">
-            <li>
+            <li id='li-toggle-sidebar'>
+				<a href='#' id='btn-toggle-sidebar' style='cursor: pointer;'>
+					<i class='fas fa-chevron-left'></i>
+					<span class='text'>Recolher menu</span>
+				</a>
+			</li>
+			<li>
                 <a href="../Controller/CLogout.php" class="logout">
                     <i class="fas fa-sign-out-alt"></i>
                     <span class="text">Deslogar</span>
@@ -108,7 +114,6 @@ $conn = $conexao->getConnection();
 
     <section id="content">
         <nav>
-            <i class='fas fa-bars'></i>
             <form action="#"></form>
 
             <div class="icons">
@@ -146,16 +151,19 @@ $conn = $conexao->getConnection();
                     <div class="order">
                         <div class="head">
                             <h3>Tabela de Devolução</h3>
-                            <h6>Status do empréstimo</h6>
-                            <a href="ativos.php"><button class="btn btn-outline-warning">Ativos</button></a>
-                            <a href="pendentes.php"><button class="btn btn-outline-danger">Pendentes</button></a>
-                            <a href="devolvidos.php"><button class="btn btn-outline-success">Devolvidos</button></a>
+                            <div class="head-status-acoes">
+                                <span class="status-label">Status do empréstimo:</span>
+                                <a href="ativos.php" class="btn-status btn-status-ativos"><i class="fas fa-clock"></i> Ativos</a>
+                                <a href="pendentes.php" class="btn-status btn-status-pendentes"><i class="fas fa-exclamation-circle"></i> Pendentes</a>
+                                <a href="devolvidos.php" class="btn-status btn-status-devolvidos"><i class="fas fa-check-circle"></i> Devolvidos</a>
+                            </div>
                             <script>
                                 function abrirAluno() {
                                     var urlDoPDF = "../pdf/devolucaoPdf.php";
                                     window.open(urlDoPDF, '_blank');
                                 }
                             </script>
+                        </div>
                         <span id="msgAlerta"></span>
                         <table id="TableDev" style="width:100%">
 								<thead>
@@ -173,8 +181,6 @@ $conn = $conexao->getConnection();
 									</tr>
 								</thead>
 							</table>
-
-						</table>
                     </div>
 
                 </div>
