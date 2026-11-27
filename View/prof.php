@@ -23,6 +23,33 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 	<link rel="stylesheet" href="../lib/datatables/dataTables.dataTables.min.css">
 	<link rel="stylesheet" href="../CSS/popup6.css">
 	<link rel="stylesheet" href="../CSS/darkPaginacao.css">
+	<style>
+		/* Alinhamento à esquerda para cabeçalho e corpo da tabela de professores */
+		#TableProf th,
+		#TableProf td {
+			text-align: left !important;
+			vertical-align: middle !important;
+		}
+		.pdf-button, #pdf-button, button.pdf-button {
+			width: auto !important;
+			min-width: fit-content !important;
+			white-space: nowrap !important;
+			display: inline-flex !important;
+			align-items: center !important;
+			justify-content: center !important;
+			gap: 8px !important;
+			padding: 8px 18px !important;
+			border-radius: 20px !important;
+			height: 38px !important;
+			background-color: #28a745 !important;
+			color: #fff !important;
+			font-size: 14px !important;
+			font-weight: 600 !important;
+			border: none !important;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+			cursor: pointer !important;
+		}
+	</style>
 	<script src="../JS/alunos_prof.js"></script>
 	<title>EducaBiblio</title>
 </head>
@@ -124,18 +151,6 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 
 		<body>
 
-			<section class="tabela">
-				<div class="row">
-					<form action="../Router/prof_rotas.php" method="post">
-						<h3>Cadastro de Professores</h3>
-						<input type="text" placeholder="ID" name="idProf" id="idProf" class="boxSecundario" autocomplete= "off" readonly>
-						<input type="text" placeholder="Nome" name="NomeProf" id="NomeProf" class="boxSecundario2" autocomplete="off">
-						<input type="email" placeholder="E-mail" name="EmailProf" id="EmailProf" class="boxSecundario2" autocomplete="off">
-						<input type="text" placeholder="Disciplina" name="MateriaProf" id="MateriaProf"  class="boxSecundario2" autocomplete="off">
-						<center><input type="submit" value="Enviar" class="inline-btn" name="action"></center>
-					</form>
-				</div>
-			</section>
 			<style>
 				/* Esconde as setas para campos de entrada numérica */
 				input[type=number]::-webkit-inner-spin-button,
@@ -148,12 +163,39 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 					-moz-appearance: textfield;
 					/* Firefox */
 				}
+
+				.btn-cadastrar-prof {
+					background-color: #3BB143;
+					color: #fff;
+					border: none;
+					padding: 10px 20px;
+					border-radius: 8px;
+					font-weight: 600;
+					font-size: 15px;
+					display: inline-flex;
+					align-items: center;
+					gap: 8px;
+					transition: background-color 0.2s;
+					cursor: pointer;
+				}
+				.btn-cadastrar-prof:hover {
+					background-color: #2e8b34;
+					color: #fff;
+				}
 			</style>
 			<main>
 				<div class="table-data">
 					<div class="order">
 						<div class="head">
 							<h3>Tabela de Cadastro de Professores</h3>
+							<div style="display: flex; align-items: center; gap: 10px; margin-left: auto; flex-wrap: wrap;">
+								<button type="button" class="btn-cadastrar-prof" data-bs-toggle="modal" data-bs-target="#cadProfModal">
+									<i class="fas fa-plus"></i> Cadastrar Professor
+								</button>
+								<button type="button" class="pdf-button" onclick="abrirAluno2()">
+									<i class="fas fa-file-pdf"></i> Exportar Relatório PDF
+								</button>
+							</div>
 
 						</div>
 						<script>
@@ -181,12 +223,47 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 					</div>
 				</div>
 
+				<!-- Criando Modal Cadastrar Professor -->
+				<div class="modal fade" id="cadProfModal" tabindex="-1" aria-labelledby="cadProfModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="cadProfModalLabel">Cadastro de Professor</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="font-size: 1.2rem; cursor: pointer;">&times;</button>
+							</div>
+							<div class="modal-body">
+								<form action="../Router/prof_rotas.php" method="post" id="form-cad-prof">
+									<div class="mb-3">
+										<label class="form-label">Nome do Professor:</label>
+										<input type="text" placeholder="Nome do Professor" name="NomeProf" id="NomeProf" required class="form-control" autocomplete="off">
+									</div>
+
+									<div class="mb-3">
+										<label class="form-label">E-mail:</label>
+										<input type="email" placeholder="E-mail" name="EmailProf" id="EmailProf" class="form-control" autocomplete="off">
+									</div>
+
+									<div class="mb-3">
+										<label class="form-label">Disciplina / Matéria:</label>
+										<input type="text" placeholder="Disciplina" name="MateriaProf" id="MateriaProf" required class="form-control" autocomplete="off">
+									</div>
+								</form>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+								<button type="submit" form="form-cad-prof" name="action" value="Enviar" class="btn btn-success">Cadastrar Professor</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
 				<!-- Criando Modal Editar -->
 				<div class="modal fade" id="editProfModal" tabindex="-1" arial-labelledby="editProfModalLabel" arial-hidden="true">
 					<div class="modal-dialog">
 						<div class="modal-content">
 							<div class="modal-header">
 								<h5 class="modal-title" id="editProfModalLabel">Editar Professores</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="font-size: 1.2rem; cursor: pointer;">&times;</button>
 							</div>
 							<div class="modal-body">
 								<span id="msgAlertErroEdit"></span>
@@ -388,11 +465,18 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 		language: {
 			url: "../lib/pt_br.json"
 		},
-		columnDefs: [{
-			"defaultContent": "-",
-			"targets": "_all",
-			"className": "dt-body-center"
-		}],
+		columnDefs: [
+			{
+				"targets": 0, // Oculta coluna ID
+				"visible": false,
+				"searchable": false
+			},
+			{
+				"defaultContent": "-",
+				"targets": "_all",
+				"className": "text-center"
+			}
+		],
 		"lengthMenu": [[10, 15, 25, 50, 100, -1], [10, 15, 25, 50, 100, "Tudo"]],
 	});
 </script>

@@ -1,3 +1,4 @@
+
 <?php
 class UsuarioController
 {
@@ -5,57 +6,84 @@ class UsuarioController
 
     public function __construct()
     {
-        // Inicializa a conexão com o banco de dados
         require_once('CConexao.php');
+
         $conexaoObj = new CConexao();
         $this->conexao = $conexaoObj->getConnection();
     }
 
     public function salvarUsuario($postData)
     {
-        // Extrai dados do formulário
-        $nome = $postData['NomeUsuario'];
-        $usuario = $postData['UserUsuario'];
-        $email = $postData['EmailUsuario'];
-        $senha = $postData['SenhaUsuario'];
+        // Extrai os dados do formulário
+        $nome = trim($postData['NomeUsuario'] ?? '');
+        $usuario = trim($postData['UserUsuario'] ?? '');
+        $email = trim($postData['EmailUsuario'] ?? '');
+        $senha = $postData['SenhaUsuario'] ?? '';
 
-        // Validação simples (você deve aprimorar a validação de acordo com suas necessidades)
+        // Validação dos campos
         if (empty($nome) || empty($usuario) || empty($email) || empty($senha)) {
             echo "Preencha todos os campos.";
             return;
         }
 
-        // Verifica se o email já está em uso (você deve implementar essa verificação)
+        // Validação do email
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            echo "Informe um email válido.";
+            return;
+        }
+
+        // Verifica se o email já está em uso
         if ($this->emailJaEmUso($email)) {
             echo "Este email já está em uso.";
             return;
         }
 
-        // Insere o usuário no banco de dados
-        $sql = "INSERT INTO usuario (UserUsuario, NomeUsuario, EmailUsuario, SenhaUsuario) VALUES (:usuario, :nome, :email, :senha)";
-        $stmt = $this->conexao->prepare($sql);
-        $stmt->bindParam(':usuario', $usuario);
-        $stmt->bindParam(':nome', $nome);
-        $stmt->bindParam(':email', $email);
-        $stmt->bindParam(':senha', $senha);
+        // Gera o hash da senha
+        $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
 
-        if ($stmt->execute()) {
-            // Redireciona o usuário para uma página de sucesso
-            header("Location: ../View/inicio.php");
-        } else {
-            // Em caso de erro, exibe uma mensagem de erro
-            echo "Ocorreu um erro ao salvar o usuário.";
+        try {
+
+            // Insere o usuário no banco de dados
+            $sql = "INSERT INTO usuario 
+                    (UserUsuario, NomeUsuario, EmailUsuario, SenhaUsuario) 
+                    VALUES (:usuario, :nome, :email, :senha)";
+
+            $stmt = $this->conexao->prepare($sql);
+
+            $stmt->bindParam(':usuario', $usuario);
+            $stmt->bindParam(':nome', $nome);
+            $stmt->bindParam(':email', $email);
+            $stmt->bindParam(':senha', $senhaHash);
+
+            if ($stmt->execute()) {
+
+                header("Location: ../View/inicio.php");
+                exit();
+
+            } else {
+
+                echo "Ocorreu um erro ao salvar o usuário.";
+
+            }
+
+        } catch (PDOException $e) {
+
+            error_log("Erro ao cadastrar usuário: " . $e->getMessage());
+            echo "Não foi possível cadastrar o usuário.";
+
         }
     }
 
     private function emailJaEmUso($email)
     {
-        // Verifique se o email já está em uso no banco de dados
         $sql = "SELECT COUNT(*) FROM usuario WHERE EmailUsuario = :email";
+
         $stmt = $this->conexao->prepare($sql);
         $stmt->bindParam(':email', $email);
         $stmt->execute();
+
         $count = $stmt->fetchColumn();
+
         return ($count > 0);
     }
 }

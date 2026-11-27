@@ -30,6 +30,33 @@ $conn = $conexao->getConnection();
 	<link rel="stylesheet" href="../lib/datatables/dataTables.dataTables.min.css">
     <link rel="stylesheet" href="../CSS/popup3.css">
     <link rel="stylesheet" href="../CSS/darkPaginacao.css">
+    <style>
+        /* Alinhamento à esquerda e estilo do botão PDF */
+        #TableDev th,
+        #TableDev td {
+            text-align: left !important;
+            vertical-align: middle !important;
+        }
+        .pdf-button, #pdf-button, button.pdf-button {
+            width: auto !important;
+            min-width: fit-content !important;
+            white-space: nowrap !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 8px !important;
+            padding: 8px 18px !important;
+            border-radius: 20px !important;
+            height: 38px !important;
+            background-color: #28a745 !important;
+            color: #fff !important;
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            border: none !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+            cursor: pointer !important;
+        }
+    </style>
 
     <title>EducaBiblio</title>
 </head>
@@ -146,8 +173,9 @@ $conn = $conexao->getConnection();
                     <div class="order">
                         <div class="head">
                             <h3>Devolvidos</h3>
-                            <button class="btn btn-outline-success" id="pdf-button" aria-label="botão pdf" onclick="abrirAluno()">
-                                <i class="fas fa-file-pdf"></i>  Relatório de Empréstimos Devolvidos</button>
+                            <button class="pdf-button" id="pdf-button" aria-label="botão pdf" onclick="abrirAluno()">
+                                <i class="fas fa-file-pdf"></i> Exportar Relatório PDF
+                            </button>
 
                             <script>
                                 function abrirAluno() {

@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="../ArquivosExternos/icons.js"></script>
-  <link rel="stylesheet" href="../CSS/login.css" />
+  <link rel="stylesheet" href="../CSS/login.css?v=<?php echo time(); ?>" />
   <link rel="shortcut icon" href="../img/icon1.png" type="image/x-icon">
   <title>EducaBiblio</title>
 </head>
@@ -13,6 +13,27 @@
   .error-message {
     color: red;
     font-weight: bold;
+  }
+  .esqueci-senha {
+    width: 100% !important;
+    max-width: 380px !important;
+    margin: 4px 0 12px 0 !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    text-align: right !important;
+  }
+  .esqueci-senha a,
+  .link-senha {
+    color: #228b22 !important;
+    text-decoration: none !important;
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+  }
+  .esqueci-senha a:hover,
+  .link-senha:hover {
+    color: #1b6d1b !important;
+    text-decoration: underline !important;
   }
 </style>
 
@@ -37,7 +58,11 @@
             <i class="fas fa-lock"></i>
             <input type="password" name="SenhaUsuario" id="SenhaUsuario" placeholder="Senha" autocomplete="off" />
             <i class="fas fa-eye toggle-password-icon" id="togglePassword"></i>
+          
           </div>
+         <p class="esqueci-senha">
+  <a href="recuperarLogin.php" class="link-senha">Esqueci minha senha ou usuário</a>
+</p>
 
           <input type="submit" name="action" value="Entrar" class="btn solid" />
 

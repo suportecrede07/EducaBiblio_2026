@@ -58,10 +58,11 @@ LEFT JOIN devolucao ON emprestimo.idEmprestimo = devolucao.emprestimo_idEmpresti
     while($row_emp = $result_emprestimo->fetch(PDO::FETCH_ASSOC)) {
         //var_dump($row_Emp);
         extract($row_emp);
+        $nomeExibido = !empty($NomeAluno) ? $NomeAluno : (!empty($NomeProfessor) ? $NomeProfessor : '-');
         $registro = [];
         $registro[] = $idEmprestimo;
         $registro[] = $TituloLivro;
-        $registro[] = $NomeAluno;
+        $registro[] = $nomeExibido;
         $registro[] = $DataEmprestimoFormatada;
         $registro[] = $DataDevolvidaFormatada;
         $registro[] = $Estado;

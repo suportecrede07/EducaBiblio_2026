@@ -21,6 +21,33 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 	<link rel="stylesheet" href="../lib/datatables/dataTables.dataTables.min.css">
 	<link rel="stylesheet" href="../CSS/popup4.css">
 	<link rel="stylesheet" href="../CSS/darkPaginacao.css">
+	<style>
+		/* Alinhamento à esquerda para cabeçalho e corpo da tabela de turmas */
+		#TableTurma th,
+		#TableTurma td {
+			text-align: left !important;
+			vertical-align: middle !important;
+		}
+		.pdf-button, #pdf-button, button.pdf-button {
+			width: auto !important;
+			min-width: fit-content !important;
+			white-space: nowrap !important;
+			display: inline-flex !important;
+			align-items: center !important;
+			justify-content: center !important;
+			gap: 8px !important;
+			padding: 8px 18px !important;
+			border-radius: 20px !important;
+			height: 38px !important;
+			background-color: #28a745 !important;
+			color: #fff !important;
+			font-size: 14px !important;
+			font-weight: 600 !important;
+			border: none !important;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+			cursor: pointer !important;
+		}
+	</style>
 	<title>EducaBiblio</title>
 </head>
 
@@ -130,20 +157,6 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 		<body>
 
 
-			<section class="tabela">
-
-				<div class="row">
-					<form action="../Router/turma_rotas.php" method="post">
-						<h3>Cadastro de Turmas</h3>
-						<input type="number" placeholder="ID" name="IdTurma" id="IdTurma" class="boxSecundario" autocomplete="off" readonly>
-						<input type="Number" placeholder="Ano de início" name="AnodeInicio" id="AnodeInicio" class="boxSecundario2" autocomplete="off">
-						<input type="text" placeholder="Série" name="AnoTurma" id="AnoTurma"  class="boxSecundario2" autocomplete="off" required>
-						<input type="text" placeholder="Turma" name="NomeTurma" id="NomeTurma" class="boxSecundario2" autocomplete="off">
-
-						<center><input type="submit" value="Enviar" class="inline-btn" name="action"></center>
-					</form>
-				</div>
-			</section>
 			<style>
 				/* Esconde as setas para campos de entrada numérica */
 				input[type=number]::-webkit-inner-spin-button,
@@ -157,7 +170,24 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 					/* Firefox */
 				}
 
-
+				.btn-cadastrar-turma {
+					background-color: #3BB143;
+					color: #fff;
+					border: none;
+					padding: 10px 20px;
+					border-radius: 8px;
+					font-weight: 600;
+					font-size: 15px;
+					display: inline-flex;
+					align-items: center;
+					gap: 8px;
+					transition: background-color 0.2s;
+					cursor: pointer;
+				}
+				.btn-cadastrar-turma:hover {
+					background-color: #2e8b34;
+					color: #fff;
+				}
 
 				.searchInput {
 					width: 20% !important;
@@ -174,9 +204,15 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 						<div class="head">
 							<span id="msgAlerta"></span>
 							<h3>Tabela de Cadastro de Turmas</h3>
-							<td>
-							<button class="btn btn-outline-success" id="pdf-button" aria-label="botão pdf" onclick="abrirAluno()">
-								<i class="fas fa-file-pdf"></i>  Relatório de Turmas</button>
+							<div style="display: flex; align-items: center; gap: 10px; margin-left: auto; flex-wrap: wrap;">
+								<button type="button" class="btn-cadastrar-turma" data-bs-toggle="modal" data-bs-target="#cadTurmasModal">
+									<i class="fas fa-plus"></i> Cadastrar Turma
+								</button>
+
+								<button class="pdf-button" id="pdf-button" aria-label="botão pdf" onclick="abrirAluno()">
+									<i class="fas fa-file-pdf"></i> Exportar Relatório PDF
+								</button>
+							</div>
 
 							<script>
 								function abrirAluno() {
@@ -206,12 +242,47 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 
 				</div>
 
+				<!-- Criando Modal Cadastrar Turma -->
+				<div class="modal fade" id="cadTurmasModal" tabindex="-1" aria-labelledby="cadTurmasModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="cadTurmasModalLabel">Cadastro de Turma</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="font-size: 1.2rem; cursor: pointer;">&times;</button>
+							</div>
+							<div class="modal-body">
+								<form action="../Router/turma_rotas.php" method="post" id="form-cad-turmas">
+									<div class="mb-3">
+										<label class="form-label">Série / Ano da Turma:</label>
+										<input type="text" placeholder="Ex: 1º, 2º, 3º" name="AnoTurma" id="AnoTurma" class="form-control" autocomplete="off" required>
+									</div>
+
+									<div class="mb-3">
+										<label class="form-label">Nome da Turma / Curso:</label>
+										<input type="text" placeholder="Ex: Informática, Redes, Administração" name="NomeTurma" id="NomeTurma" class="form-control" autocomplete="off" required>
+									</div>
+
+									<div class="mb-3">
+										<label class="form-label">Ano de Início:</label>
+										<input type="number" placeholder="Ano de início (Ex: 2024)" name="AnodeInicio" id="AnodeInicio" class="form-control" autocomplete="off">
+									</div>
+								</form>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+								<button type="submit" form="form-cad-turmas" name="action" value="Enviar" class="btn btn-success">Cadastrar Turma</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
 				<!-- Criando Modal Editar -->
 				<div class="modal fade" id="editTurmasModal" tabindex="-1" arial-labelledby="editTurmasModalLabel" arial-hidden="true">
 					<div class="modal-dialog">
 						<div class="modal-content">
 							<div class="modal-header">
 								<h5 class="modal-title" id="editTurmasModalLabel">Editar Turmas</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="font-size: 1.2rem; cursor: pointer;">&times;</button>
 							</div>
 							<div class="modal-body">
 								<span id="msgAlertErroEdit"></span>
@@ -421,7 +492,7 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 		columnDefs: [{
 			"defaultContent": "-",
 			"targets": "_all",
-			"className": "dt-body-center"
+			"className": "text-center"
 		}],
 		"lengthMenu": [[10, 15, 25, 50, 100, -1], [10, 15, 25, 50, 100, "Tudo"]],
 	});

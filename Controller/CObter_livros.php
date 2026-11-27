@@ -26,7 +26,7 @@
         LEFT JOIN
             genero ON livro.Genero_idGenero = genero.idGenero
         LEFT JOIN
-            autor ON livro.Autor_idAutor = autor.idAutor
+            autor ON livro.autor_idAutor = autor.idAutor
         LEFT JOIN
             idioma ON livro.Idioma_idIdioma = idioma.idIdioma";
 

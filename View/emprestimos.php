@@ -38,6 +38,14 @@ $conn = $conexao->getConnection();
 	<link rel="stylesheet" href="../lib/Bootstrap 2/bootstrap.min.css">
 	<link rel="stylesheet" href="../lib/datatables/dataTables.dataTables.min.css">
 	<link rel="stylesheet" href="../CSS/darkPaginacao.css">
+	<style>
+		/* Alinhamento à esquerda para tabelas de empréstimos */
+		#TableEmprestimos th,
+		#TableEmprestimos td {
+			text-align: left !important;
+			vertical-align: middle !important;
+		}
+	</style>
 	<title>EducaBiblio</title>
 </head>
 
@@ -144,116 +152,6 @@ $conn = $conexao->getConnection();
 
 		<body>
 
-			<section class="tabela">
-
-				<div class="row">
-					<form action="../Router/emp_rotas.php" method="post">
-						<h3>Empréstimo de livros</h3>
-						<input type="text" placeholder="ID" name="idEmprestimo" id="idEmprestimo" required maxlength="50" class="box2" autocomplete="off" readonly>
-						<select id="Genero_idGenero" class="box select-dark-mode" required>
-							<option value="">Selecione um gênero</option>
-							<?php
-							// Preencha as opções de gênero a partir do banco de dados.
-							$query = "SELECT idGenero, NomeGenero FROM genero";
-							$stmt = $conn->query($query);
-							while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-								echo "<option value='" . $row['idGenero'] . "'>" . $row['NomeGenero'] . "</option>";
-							}
-							?>
-						</select>
-						<select id="livro_idLivro" name="livro_idLivro" class="box select2" style="text-align: left">
-							<option value="">Selecione um livro</option>
-						</select>
-
-						<select id="Turma_idTurma" name="Turma_idTurma" class="box select-dark-mode" required>
-							<option value="">Turma</option>
-							<option value="0">Professor</option>
-							<?php
-							// Preencha as opções de turma a partir do banco de dados.
-							$query = "SELECT IdTurma, AnodeInicio, AnoTurma, NomeTurma FROM turma";
-							$stmt = $conn->query($query);
-							while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-								echo "<option value='" . $row['IdTurma'] . "'>" . $row['AnoTurma'] . 'º ' . $row['NomeTurma'] . "</option>";
-							}
-							?>
-						</select>
-
-						<select id="prof_idProf" name="prof_idProf" class="box select-dark-mode">
-							<option value="">Selecione um prof</option>
-							<!--Opções de prof serão preenchidas dinamicamente com JavaScript -->
-						</select>
-
-						<select id="aluno_idAluno" name="aluno_idAluno" class="box select-dark-mode">
-							<option value="">Selecione um aluno</option>
-							<!-- Opções de alunos serão preenchidas dinamicamente com JavaScript -->
-						</select>
-						<input type="text" placeholder="Quantidade" name="quantidade" class="box" autocomplete="off" required>
-
-
-
-
-
-						<input type="date" placeholder="DD/MM/AAAA" name="DataEmprestimo" id="DataEmprestimo" class="box" autocomplete="off" min="2024/01/01" max="2100/01/01" required>
-						<input type="date" placeholder="DD/MM/AAAA" name="DataDevolucao" id="DataDevolucao" class="box" autocomplete="off" min="2024/01/01" max="2100/01/01" required>
-
-
-						<script>
-							const dataEmprestimo = document.getElementById("DataEmprestimo");
-							const dataDevolucao = document.getElementById("DataDevolucao");
-
-							// Formata a data para YYYY-MM-DD
-							function formatarDataInput(data) {
-								const ano = data.getFullYear();
-								const mes = String(data.getMonth() + 1).padStart(2, '0');
-								const dia = String(data.getDate()).padStart(2, '0');
-
-								return `${ano}-${mes}-${dia}`;
-							}
-
-							// Calcula a devolução para 7 dias após o empréstimo
-							function calcularDevolucao() {
-								if (!dataEmprestimo.value) return;
-
-								const [ano, mes, dia] = dataEmprestimo.value.split('-').map(Number);
-
-								const data = new Date(ano, mes - 1, dia);
-
-								data.setDate(data.getDate() + 7);
-
-								dataDevolucao.value = formatarDataInput(data);
-							}
-
-							// Define a data atual ao acessar a página
-							const hoje = new Date();
-
-							dataEmprestimo.value = formatarDataInput(hoje);
-
-							// Calcula automaticamente a data de devolução
-							calcularDevolucao();
-
-							// Atualiza a devolução caso a data do empréstimo seja alterada
-							dataEmprestimo.addEventListener("change", calcularDevolucao);
-						</script>
-
-
-						<select id="usuario_idUsuario" name="usuario_idUsuario" class="box select-dark-mode" required>
-							<option value="">Selecione um usuário</option>
-							<?php
-							// Preencha as opções de usuário a partir do banco de dados.
-							$query = "SELECT idUsuario, UserUsuario FROM usuario";
-							$stmt = $conn->query($query);
-							while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-								echo "<option value='" . $row['idUsuario'] . "'>" . $row['UserUsuario'] . "</option>";
-							}
-							?>
-						</select>
-
-
-				</div>
-				<center> <input type="submit" value="Enviar" class="inline-btn" name="emprestar"> </center>
-				</form>
-				</div>
-			</section>
 			<style>
 				/* Esconde as setas para campos de entrada numérica */
 				input[type=number]::-webkit-inner-spin-button,
@@ -275,12 +173,34 @@ $conn = $conexao->getConnection();
 					border-radius: 5px;
 					padding: 5px;
 				}
+
+				.btn-cadastrar-emp {
+					background-color: #3BB143;
+					color: #fff;
+					border: none;
+					padding: 10px 20px;
+					border-radius: 8px;
+					font-weight: 600;
+					font-size: 15px;
+					display: inline-flex;
+					align-items: center;
+					gap: 8px;
+					transition: background-color 0.2s;
+					cursor: pointer;
+				}
+				.btn-cadastrar-emp:hover {
+					background-color: #2e8b34;
+					color: #fff;
+				}
 			</style>
 			<main>
 				<div class="table-data">
 					<div class="order">
 						<div class="head">
 							<h3>Tabela de Empréstimos</h3>
+							<button type="button" class="btn-cadastrar-emp" data-bs-toggle="modal" data-bs-target="#cadEmpModal">
+								<i class="fas fa-plus"></i> Novo Empréstimo
+							</button>
 
 							<span id="msgAlerta"></span>
 
@@ -306,12 +226,111 @@ $conn = $conexao->getConnection();
 					</div>
 				</div>
 
+				<!-- Criando Modal Cadastrar Empréstimo -->
+				<div class="modal fade" id="cadEmpModal" tabindex="-1" aria-labelledby="cadEmpModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="cadEmpModalLabel">Novo Empréstimo</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="font-size: 1.2rem; cursor: pointer;">&times;</button>
+							</div>
+							<div class="modal-body">
+								<form action="../Router/emp_rotas.php" method="post" id="form-cad-emp">
+									<div class="mb-3">
+										<label class="form-label">Gênero:</label>
+										<select id="Genero_idGenero" class="form-control" required>
+											<option value="">Selecione um gênero</option>
+											<?php
+											$query = "SELECT idGenero, NomeGenero FROM genero";
+											$stmt = $conn->query($query);
+											while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+												echo "<option value='" . $row['idGenero'] . "'>" . $row['NomeGenero'] . "</option>";
+											}
+											?>
+										</select>
+									</div>
+
+									<div class="mb-3">
+										<label class="form-label">Livro:</label>
+										<select id="livro_idLivro" name="livro_idLivro" class="form-control" style="text-align: left; width: 100%;" required>
+											<option value="">Selecione um livro</option>
+										</select>
+									</div>
+
+									<div class="mb-3">
+										<label class="form-label">Turma / Tipo:</label>
+										<select id="Turma_idTurma" name="Turma_idTurma" class="form-control" required>
+											<option value="">Selecione a Turma</option>
+											<option value="0">Professor</option>
+											<?php
+											$query = "SELECT IdTurma, AnodeInicio, AnoTurma, NomeTurma FROM turma";
+											$stmt = $conn->query($query);
+											while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+												echo "<option value='" . $row['IdTurma'] . "'>" . $row['AnoTurma'] . 'º ' . $row['NomeTurma'] . "</option>";
+											}
+											?>
+										</select>
+									</div>
+
+									<div class="mb-3">
+										<label class="form-label">Professor:</label>
+										<select id="prof_idProf" name="prof_idProf" class="form-control">
+											<option value="">Selecione um professor</option>
+										</select>
+									</div>
+
+									<div class="mb-3">
+										<label class="form-label">Aluno:</label>
+										<select id="aluno_idAluno" name="aluno_idAluno" class="form-control">
+											<option value="">Selecione um aluno</option>
+										</select>
+									</div>
+
+									<div class="mb-3">
+										<label class="form-label">Quantidade:</label>
+										<input type="number" placeholder="Quantidade" name="quantidade" id="cadQuantidade" class="form-control" value="1" min="1" required autocomplete="off">
+									</div>
+
+									<div class="mb-3">
+										<label class="form-label">Data de Empréstimo:</label>
+										<input type="date" name="DataEmprestimo" id="DataEmprestimo" class="form-control" required autocomplete="off">
+									</div>
+
+									<div class="mb-3">
+										<label class="form-label">Data de Devolução:</label>
+										<input type="date" name="DataDevolucao" id="DataDevolucao" class="form-control" required autocomplete="off">
+									</div>
+
+									<div class="mb-3">
+										<label class="form-label">Responsável pelo Empréstimo:</label>
+										<select id="usuario_idUsuario" name="usuario_idUsuario" class="form-control" required>
+											<option value="">Selecione um usuário</option>
+											<?php
+											$query = "SELECT idUsuario, UserUsuario FROM usuario";
+											$stmt = $conn->query($query);
+											while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+												echo "<option value='" . $row['idUsuario'] . "'>" . $row['UserUsuario'] . "</option>";
+											}
+											?>
+										</select>
+									</div>
+								</form>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+								<button type="submit" form="form-cad-emp" name="emprestar" value="Enviar" class="btn btn-success">Salvar Empréstimo</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
 				<!-- Criando Modal Visualizar -->
 				<div class="modal fade" id="visEmpModal" tabindex="-1" arial-labelledby="visEmpModalLabel" arial-hidden="true">
 					<div class="modal-dialog">
 						<div class="modal-content">
 							<div class="modal-header">
 								<h5 class="modal-title" id="visEmpModalLabel">Detalhes do Emprestimo</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="font-size: 1.2rem; cursor: pointer;">&times;</button>
 							</div>
 							<div class="modal-body">
 								<dl class="row">
@@ -347,6 +366,7 @@ $conn = $conexao->getConnection();
 						<div class="modal-content">
 							<div class="modal-header">
 								<h5 class="modal-title" id="editEmpModalLabel">Editar Empréstimo</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="font-size: 1.2rem; cursor: pointer;">&times;</button>
 							</div>
 							<div class="modal-body">
 								<span id="msgAlertErroEdit"></span>
@@ -483,6 +503,38 @@ $conn = $conexao->getConnection();
 <script src="../lib/Bootstrap 2/bootstrap.bundle.min.js"></script>
 <script src="../lib/select2/select2.min.js"></script>
 
+
+<script>
+	// Script para inicializar e calcular devolução automática de empréstimo
+	$(document).ready(function() {
+		const dataEmprestimo = document.getElementById("DataEmprestimo");
+		const dataDevolucao = document.getElementById("DataDevolucao");
+
+		function formatarDataInput(data) {
+			const ano = data.getFullYear();
+			const mes = String(data.getMonth() + 1).padStart(2, '0');
+			const dia = String(data.getDate()).padStart(2, '0');
+			return `${ano}-${mes}-${dia}`;
+		}
+
+		function calcularDevolucao() {
+			if (!dataEmprestimo || !dataEmprestimo.value) return;
+			const [ano, mes, dia] = dataEmprestimo.value.split('-').map(Number);
+			const data = new Date(ano, mes - 1, dia);
+			data.setDate(data.getDate() + 7);
+			if (dataDevolucao) {
+				dataDevolucao.value = formatarDataInput(data);
+			}
+		}
+
+		if (dataEmprestimo && dataDevolucao) {
+			const hoje = new Date();
+			dataEmprestimo.value = formatarDataInput(hoje);
+			calcularDevolucao();
+			dataEmprestimo.addEventListener("change", calcularDevolucao);
+		}
+	});
+</script>
 
 <script>
 	window.addEventListener('load', () => {
@@ -887,15 +939,30 @@ $conn = $conexao->getConnection();
 
 		processing: true,
 		serverSide: true,
+		autoWidth: false,
 		language: {
 			url: "../lib/pt_br.json"
 		},
-		columnDefs: [{
-			"defaultContent": "-",
-			"targets": "_all",
-			"className": "dt-center",
-			"targets": "_all"
-		}],
+		columns: [
+			{ width: "22%", className: "text-start" }, // Livro (0)
+			{ width: "10%", className: "text-start" }, // Gênero (1)
+			{ visible: false, searchable: false },      // Id (2)
+			{ width: "6%",  className: "text-start" }, // Ano (3)
+			{ width: "8%",  className: "text-start" }, // Turma (4)
+			{ width: "16%", className: "text-start" }, // Leitor (5)
+			{ width: "11%", className: "text-start" }, // Data Empréstimo (6)
+			{ width: "11%", className: "text-start" }, // Data Devolução (7)
+			{ width: "4%",  className: "text-center" }, // Visualizar (8)
+			{ width: "4%",  className: "text-center" }, // Editar (9)
+			{ width: "4%",  className: "text-center" }, // Renovar (10)
+			{ width: "4%",  className: "text-center" }  // Excluir (11)
+		],
+		columnDefs: [
+			{
+				"defaultContent": "-",
+				"targets": "_all"
+			}
+		],
 		"lengthMenu": [
 			[10, 15, 25, 50, 100, -1],
 			[10, 15, 25, 50, 100, "Tudo"]

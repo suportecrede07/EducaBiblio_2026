@@ -37,7 +37,7 @@ LEFT JOIN aluno ON emprestimo.aluno_idAluno = aluno.idAluno
 LEFT JOIN devolucao ON emprestimo.idEmprestimo = devolucao.emprestimo_idEmprestimo
 LEFT JOIN livro ON emprestimo.livro_idLivro = livro.idLivro
 LEFT JOIN genero ON livro.Genero_idGenero = genero.idGenero
-LEFT JOIN autor ON livro.Autor_idAutor = autor.idAutor
+LEFT JOIN autor ON livro.autor_idAutor = autor.idAutor
 LEFT JOIN idioma ON livro.Idioma_idIdioma = idioma.idIdioma
 WHERE aluno.idAluno = $idAluno;
 ";

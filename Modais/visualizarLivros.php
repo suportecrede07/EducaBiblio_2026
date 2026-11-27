@@ -1,10 +1,10 @@
 <?php 
     //Conexao com banco de dados
-    include_once '../Controller/CConexao.php';
+    include_once __DIR__ . '/../Controller/CConexao.php';
     $conexao = new CConexao();
     $conn = $conexao->getConnection();
 
-    $idLivro = filter_input(INPUT_GET, "idLivro", FILTER_SANITIZE_NUMBER_INT);
+    $idLivro = isset($_GET['idLivro']) ? intval($_GET['idLivro']) : 0;
 
     if(!empty($idLivro)){
         $sqlLivros = "SELECT
@@ -13,7 +13,7 @@
         livro.EditoraLivro,
         livro.Tombo,
         livro.IBSMLivro,
-        livro.QuantidadeLivros,
+        livro.Quantidadelivros AS QuantidadeLivros,
         genero.NomeGenero AS GeneroLivro,
         idioma.Idioma AS IdiomaLivro,
         autor.NomeAutor
@@ -22,7 +22,7 @@
     LEFT JOIN
          genero ON livro.Genero_idGenero = genero.idGenero
     LEFT JOIN
-        autor ON livro.Autor_idAutor = autor.idAutor
+        autor ON livro.autor_idAutor = autor.idAutor
     LEFT JOIN
         idioma ON livro.Idioma_idIdioma = idioma.idIdioma
         WHERE idLivro = :idLivro";

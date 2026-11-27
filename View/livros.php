@@ -23,6 +23,34 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 	<link rel="stylesheet" href="../lib/datatables/dataTables.dataTables.min.css">
 	<link rel="stylesheet" href="../CSS/darkPaginacao.css">	
 
+	<style>
+		/* Força o cabeçalho e todas as células da tabela a alinharem à esquerda */
+		#TableLivros th,
+		#TableLivros td {
+			text-align: left !important;
+			vertical-align: middle !important;
+		}
+		.pdf-button, #pdf-button, button.pdf-button {
+			width: auto !important;
+			min-width: fit-content !important;
+			white-space: nowrap !important;
+			display: inline-flex !important;
+			align-items: center !important;
+			justify-content: center !important;
+			gap: 8px !important;
+			padding: 8px 18px !important;
+			border-radius: 20px !important;
+			height: 38px !important;
+			background-color: #28a745 !important;
+			color: #fff !important;
+			font-size: 14px !important;
+			font-weight: 600 !important;
+			border: none !important;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+			cursor: pointer !important;
+		}
+	</style>
+
 	<title>EducaBiblio</title>
 </head>
 
@@ -129,46 +157,6 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 
 		<body>
 
-			<section class="tabela">
-
-				<div class="row">
-					<form action="../Router/livro_rotas.php" method="post" enctype="multipart/form-data">
-						<h3>Cadastro de Livros</h3>
-						<input type="text" placeholder="ID" name="idLivro" id="idLivro" required  class="box3" autocomplete="off" readonly>
-						<input type="text" placeholder="Nome" name="NomeLivro" id="NomeLivro" required maxlength="50" class="box" autocomplete="off" required>
-						<input type="text" placeholder="Autor" name="NomeAutor" id="NomeAutor" maxlength="50" class="box" autocomplete="off" required>
-						<input type="text" placeholder="Edição" name="EdicaoLivro" id="EdicaoLivro" maxlength="50" class="box" autocomplete="off">
-						<input type="text" placeholder="Editora" name="EditoraLivro" id="EditoraLivro" maxlength="50" class="box" autocomplete="off">
-						<input type="text" placeholder="Tombo" name="Tombo" id="Tombo" maxlength="50" class="box" autocomplete="off">
-
-						<select name="Genero_idGenero" id="Genero_idGenero" class="box select-dark-mode" required>
-							<option value="1">Autoajuda</option>
-							<option value="2">Biografia</option>
-							<option value="3">Clássico</option>
-							<option value="4">Conto</option>
-							<option value="5">Fantasia</option>
-							<option value="6">Ficção</option>
-							<option value="7">Poesia</option>
-							<option value="8">Romance</option>
-							<option value="9">Outro</option>
-							<option value="10">Crônica</option>
-							<option value="11">Quadrinhos</option>
-							<option value="12">Didático</option>
-							<option value="13">Mitologia</option>
-							<option value="14">Teatro</option>
-						</select>
-						<select name="Idioma_idIdioma" id="Idioma_idIdioma" class="box select-dark-mode">
-							<option value="1">Português</option>
-							<option value="2">Inglês</option>
-							<option value="3">Espanhol</option>
-						</select>
-
-						<input type="text" placeholder="Quantidade" name="QuantidadeLivros" id="QuantidadeLivros" class="box" autocomplete="off">
-
-						<center><input type="submit" value="Cadastrar" id="cadastrar" class="inline-btn" name="action"></center>
-					</form>
-				</div>
-			</section>
 			<style>
 				/* Esconde as setas para campos de entrada numérica */
 				input[type=number]::-webkit-inner-spin-button,
@@ -180,12 +168,39 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 				input[type=number] {
 					-moz-appearance: textfield;
 				}
+
+				.btn-cadastrar-livro {
+					background-color: #3BB143;
+					color: #fff;
+					border: none;
+					padding: 10px 20px;
+					border-radius: 8px;
+					font-weight: 600;
+					font-size: 15px;
+					display: inline-flex;
+					align-items: center;
+					gap: 8px;
+					transition: background-color 0.2s;
+					cursor: pointer;
+				}
+				.btn-cadastrar-livro:hover {
+					background-color: #2e8b34;
+					color: #fff;
+				}
 			</style>
 			<main>
 				<div class="table-data">
 					<div class="order">
 						<div class="head">
 							<h3>Tabela de Cadastro Livros</h3>
+							<div style="display: flex; align-items: center; gap: 10px; margin-left: auto; flex-wrap: wrap;">
+								<button type="button" class="btn-cadastrar-livro" data-bs-toggle="modal" data-bs-target="#cadLivrosModal">
+									<i class="fas fa-plus"></i> Cadastrar Livro
+								</button>
+								<button type="button" class="pdf-button" onclick="abrirAluno()">
+									<i class="fas fa-file-pdf"></i> Exportar Relatório PDF
+								</button>
+							</div>
 
 							<script>
 								function abrirAluno() {
@@ -196,13 +211,21 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 
 						</div>
 
-						<span id="msgAlerta"></span>
+						<span id="msgAlerta">
+							<?php
+							if (isset($_SESSION['msgAlerta'])) {
+								echo $_SESSION['msgAlerta'];
+								unset($_SESSION['msgAlerta']);
+							}
+							?>
+						</span>
 
 						<table id="TableLivros" style="width:100%">
 								<thead>
 									<tr>
 										<th>ID</th>
 										<th>Nome</th>
+										<th>Autor</th>
 										<th>Editora</th>
 										<th>Tombo</th>
 										<th>Quantidade</th>
@@ -213,8 +236,86 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 										<th>Excluir</th>
 									</tr>
 								</thead>
-							</table>	
-						</table>
+							</table>
+					</div>
+				</div>
+
+				<!-- Criando Modal Cadastrar Livro -->
+				<div class="modal fade" id="cadLivrosModal" tabindex="-1" aria-labelledby="cadLivrosModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="cadLivrosModalLabel">Cadastro de Livros</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="font-size: 1.2rem; cursor: pointer;">&times;</button>
+							</div>
+							<div class="modal-body">
+								<form action="../Router/livro_rotas.php" method="post" id="form-cad-livros" enctype="multipart/form-data">
+									<div class="mb-3">
+										<label class="form-label">Nome do Livro:</label>
+										<input type="text" placeholder="Nome do Livro" name="NomeLivro" id="cadNomeLivro" required maxlength="100" class="form-control" autocomplete="off">
+									</div>
+
+									<div class="mb-3">
+										<label class="form-label">Autor:</label>
+										<input type="text" placeholder="Nome do Autor" name="NomeAutor" id="cadNomeAutor" required maxlength="100" class="form-control" autocomplete="off">
+									</div>
+
+									<div class="mb-3">
+										<label class="form-label">Editora:</label>
+										<input type="text" placeholder="Editora" name="EditoraLivro" id="cadEditoraLivro" maxlength="50" class="form-control" autocomplete="off">
+									</div>
+
+									<div class="mb-3">
+										<label class="form-label">Edição:</label>
+										<input type="text" placeholder="Edição" name="EdicaoLivro" id="cadEdicaoLivro" maxlength="50" class="form-control" autocomplete="off">
+									</div>
+
+									<div class="mb-3">
+										<label class="form-label">Tombo:</label>
+										<input type="text" placeholder="Tombo" name="Tombo" id="cadTombo" maxlength="50" class="form-control" autocomplete="off">
+									</div>
+
+									<div class="mb-3">
+										<label class="form-label">Selecione um Gênero:</label>
+										<select name="Genero_idGenero" id="cadGenero_idGenero" class="form-control" required>
+											<option value="">Selecione um Gênero</option>
+											<option value="1">Autoajuda</option>
+											<option value="2">Biografia</option>
+											<option value="3">Clássico</option>
+											<option value="4">Conto</option>
+											<option value="5">Fantasia</option>
+											<option value="6">Ficção</option>
+											<option value="7">Poesia</option>
+											<option value="8">Romance</option>
+											<option value="9">Outro</option>
+											<option value="10">Crônica</option>
+											<option value="11">Quadrinhos</option>
+											<option value="12">Didático</option>
+											<option value="13">Mitologia</option>
+											<option value="14">Teatro</option>
+										</select>
+									</div>
+
+									<div class="mb-3">
+										<label class="form-label">Selecione um Idioma:</label>
+										<select name="Idioma_idIdioma" id="cadIdioma_idIdioma" class="form-control">
+											<option value="1">Português</option>
+											<option value="2">Inglês</option>
+											<option value="3">Espanhol</option>
+										</select>
+									</div>
+
+									<div class="mb-3">
+										<label class="form-label">Quantidade:</label>
+										<input type="number" placeholder="Quantidade" name="QuantidadeLivros" id="cadQuantidadeLivros" class="form-control" min="1" value="1" autocomplete="off">
+									</div>
+								</form>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+								<button type="submit" form="form-cad-livros" name="action" value="Cadastrar" class="btn btn-success">Cadastrar</button>
+							</div>
+						</div>
 					</div>
 				</div>
 
@@ -224,6 +325,7 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 						<div class="modal-content">
 							<div class="modal-header">
 								<h5 class="modal-title" id="visLivrosModalLabel">Detalhes do Livro</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="font-size: 1.2rem; cursor: pointer;">&times;</button>
 							</div>
 							<div class="modal-body">
 								<dl class="row">
@@ -232,6 +334,9 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 
 									<dt class="col-sm-3">Nome</dt>
 									<dd class="col-sm-9"><span id="nomeLivro"></span></dd>
+
+									<dt class="col-sm-3">Autor</dt>
+									<dd class="col-sm-9"><span id="autorLivro"></span></dd>
 
 									<dt class="col-sm-3">Editora</dt>
 									<dd class="col-sm-9"><span id="editoraLivro"></span></dd>
@@ -263,6 +368,7 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 						<div class="modal-content">
 							<div class="modal-header">
 								<h5 class="modal-title" id="editLivrosModalLabel">Editar Livros</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="font-size: 1.2rem; cursor: pointer;">&times;</button>
 							</div>
 							<div class="modal-body">
 								<span id="msgAlertErroEdit"></span>
@@ -273,6 +379,10 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 									<div class="mb-3">
 										<label for="form-control">Nome do Livro:</label>
 										<input type="text" class="form-control" name="NomeLivro" id="editNome" required autocomplete="off" >
+									</div>
+									<div class="mb-3">
+										<label for="form-control">Autor:</label>
+										<input type="text" class="form-control" name="NomeAutor" id="editAutor" autocomplete="off" >
 									</div>
 									<div class="mb-3">
 										<label for="form-control">Editora:</label>
@@ -354,6 +464,7 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 
 			document.getElementById("idLiv").innerHTML = resposta['dados'].idLivro;
 			document.getElementById("nomeLivro").innerHTML = resposta['dados'].NomeLivro;
+			document.getElementById("autorLivro").innerHTML = resposta['dados'].NomeAutor || 'Não informado';
 			document.getElementById("editoraLivro").innerHTML = resposta['dados'].EditoraLivro;
 			document.getElementById("tomboLivro").innerHTML = resposta['dados'].Tombo;
 			document.getElementById("quantLivro").innerHTML = resposta['dados'].QuantidadeLivros;
@@ -381,6 +492,7 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 
 			document.getElementById("editId").value = resposta['dados'].idLivro;
 			document.getElementById("editNome").value = resposta['dados'].NomeLivro;
+			document.getElementById("editAutor").value = resposta['dados'].NomeAutor || '';
 			document.getElementById("editEditora").value = resposta['dados'].EditoraLivro;
 			document.getElementById("editTombo").value = resposta['dados'].Tombo;
 		}else{
@@ -453,14 +565,29 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 		},
 		processing: true,
 		serverSide: true,
+		autoWidth: false,
 		language: {
 			url: "../lib/pt_br.json"
 		},
-		columnDefs: [{
-			"defaultContent": "-",
-			"targets": "_all",
-			"className": "dt-body-center"
-		}],
+		columns: [
+			{ visible: false, searchable: false }, // ID (0)
+			{ width: "22%", className: "text-start" }, // Nome (1)
+			{ width: "18%", className: "text-start" }, // Autor (2)
+			{ width: "12%", className: "text-start" }, // Editora (3)
+			{ width: "8%",  className: "text-start" }, // Tombo (4)
+			{ width: "8%",  className: "text-center" }, // Quantidade (5)
+			{ width: "10%", className: "text-start" }, // Gênero (6)
+			{ width: "8%",  className: "text-start" }, // Idioma (7)
+			{ width: "5%",  className: "text-center" }, // Visualizar (8)
+			{ width: "5%",  className: "text-center" }, // Editar (9)
+			{ width: "5%",  className: "text-center" }  // Excluir (10)
+		],
+		columnDefs: [
+			{
+				"defaultContent": "-",
+				"targets": "_all"
+			}
+		],
 		"lengthMenu": [[10, 15, 25, 50, 100, -1], [10, 15, 25, 50, 100, "Tudo"]],
 	});
 </script>

@@ -22,7 +22,7 @@ $sql = "SELECT
         LEFT JOIN
             genero ON livro.Genero_idGenero = genero.idGenero
         LEFT JOIN
-            autor ON livro.Autor_idAutor = autor.idAutor
+            autor ON livro.autor_idAutor = autor.idAutor
         LEFT JOIN
             idioma ON livro.Idioma_idIdioma = idioma.idIdioma";
 
@@ -95,6 +95,7 @@ if ($res->num_rows > 0) {
             <thead>
                 <tr>
                     <th>Título</th>
+                    <th>Autor</th>
                     <th>Tombo</th>
                     <th>Editora</th>
                     <th>ISBN/CDD</th>
@@ -108,6 +109,7 @@ if ($res->num_rows > 0) {
     while ($row = $res->fetch_object()) {
         $html .= "<tr>";
         $html .= "<td>" . $row->NomeLivro . "</td>";
+        $html .= "<td>" . (!empty($row->NomeAutor) ? $row->NomeAutor : '-') . "</td>";
         $html .= "<td>" . $row->Tombo . "</td>";
         $html .= "<td>" . $row->EditoraLivro . "</td>";
         $html .= "<td>" . $row->IBSMLivro . "</td>";

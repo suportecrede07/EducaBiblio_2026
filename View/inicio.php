@@ -30,6 +30,51 @@ include('../Controller/CPendencias.php'); // Inclua o arquivo CPendencias.php aq
 	<link rel="stylesheet" href="../CSS/style.css">
 	<link rel="stylesheet" href="../lib/datatables/dataTables.dataTables.min.css">
 	<link rel="stylesheet" href="../CSS/darkPaginacao.css">
+	<style>
+		/* Alinhamento à esquerda e espaçamento harmonioso sem linhas visíveis */
+		#TableHistorico th,
+		#TableHistorico td {
+			text-align: left !important;
+			vertical-align: middle !important;
+			padding: 10px 14px !important;
+			border: none !important;
+		}
+		#TableHistorico thead th {
+			text-align: left !important;
+		}
+		#TableHistorico tbody tr {
+			border: none !important;
+		}
+		#TableHistorico tbody tr:hover {
+			background-color: transparent !important;
+		}
+
+		/* Garantia do botão PDF no formato pílula verde na ponta direita */
+		.pdf-button, #pdf-button, button.pdf-button {
+			margin-left: auto !important;
+			width: auto !important;
+			min-width: fit-content !important;
+			white-space: nowrap !important;
+			display: inline-flex !important;
+			align-items: center !important;
+			justify-content: center !important;
+			gap: 8px !important;
+			padding: 8px 18px !important;
+			border-radius: 20px !important;
+			height: 38px !important;
+			background-color: #28a745 !important;
+			color: #fff !important;
+			font-size: 14px !important;
+			font-weight: 600 !important;
+			border: none !important;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+			cursor: pointer !important;
+		}
+		.pdf-button:hover, #pdf-button:hover, button.pdf-button:hover {
+			background-color: #218838 !important;
+			color: #fff !important;
+		}
+	</style>
 </head>
 
 <body>
@@ -298,7 +343,8 @@ include('../Controller/CPendencias.php'); // Inclua o arquivo CPendencias.php aq
 						<h3>Histórico de Empréstimos</h3>
 
 						<button class="pdf-button" id="pdf-button" aria-label="botão pdf" onclick="abrirAluno()">
-							<i class="fas fa-file-pdf"></i></button>
+							<i class="fas fa-file-pdf"></i> Exportar Relatório PDF
+						</button>
 
 						<script>
 							function abrirAluno() {
@@ -308,21 +354,18 @@ include('../Controller/CPendencias.php'); // Inclua o arquivo CPendencias.php aq
 						</script>
 
 					</div>
-					<table id="TableHistorico" class="table" style="width:100%">
-								<thead>
-									<tr>
-										<th>Id</th>
-										<th>Livro</th>
-										<th>Nome</th>
-										<th>Data de empréstimo</th>
-										<th>Data de devolução</th>
-										<th>Estado</th>
-									</tr>
-								</thead>
-							</table>
-
-							
-						</table>
+					<table id="TableHistorico" style="width:100%">
+						<thead>
+							<tr>
+								<th>Id</th>
+								<th>Livro</th>
+								<th>Nome</th>
+								<th>Data de empréstimo</th>
+								<th>Data de devolução</th>
+								<th>Estado</th>
+							</tr>
+						</thead>
+					</table>
 					
 					</div>
 
@@ -352,13 +395,21 @@ include('../Controller/CPendencias.php'); // Inclua o arquivo CPendencias.php aq
 			},
 			processing: true,
 			serverSide: true,
+			autoWidth: false,
 			language: {
 				url: "../lib/pt_br.json"
 			},
+			columns: [
+				{ visible: false },                       // Id (oculto)
+				{ width: "30%", className: "text-start" }, // Livro
+				{ width: "26%", className: "text-start" }, // Nome do Leitor
+				{ width: "16%", className: "text-start" }, // Data de empréstimo
+				{ width: "16%", className: "text-start" }, // Data de devolução
+				{ width: "12%", className: "text-start" }  // Estado
+			],
 			columnDefs: [{
 				"defaultContent": "-",
-				"targets": "_all",
-				"className": "dt-body-center"
+				"targets": "_all"
 			}],
 			"lengthMenu": [[10, 15, 25, 50, 100, -1], [10, 15, 25, 50, 100, "Tudo"]],
 		});

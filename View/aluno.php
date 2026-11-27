@@ -22,6 +22,33 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 	<link rel="stylesheet" href="../lib/datatables/dataTables.dataTables.min.css">
 	<link rel="stylesheet" href="../CSS/popup.css">
 	<link rel="stylesheet" href="../CSS/darkPaginacao.css">
+	<style>
+		/* Alinhamento à esquerda para cabeçalho e corpo da tabela de alunos */
+		#TableAlunos th,
+		#TableAlunos td {
+			text-align: left !important;
+			vertical-align: middle !important;
+		}
+		.pdf-button, #pdf-button, button.pdf-button {
+			width: auto !important;
+			min-width: fit-content !important;
+			white-space: nowrap !important;
+			display: inline-flex !important;
+			align-items: center !important;
+			justify-content: center !important;
+			gap: 8px !important;
+			padding: 8px 18px !important;
+			border-radius: 20px !important;
+			height: 38px !important;
+			background-color: #28a745 !important;
+			color: #fff !important;
+			font-size: 14px !important;
+			font-weight: 600 !important;
+			border: none !important;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+			cursor: pointer !important;
+		}
+	</style>
 	<title>EducaBiblio</title>
 </head>
 
@@ -129,38 +156,6 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 
 		<body>
 
-			<section class="tabela">
-				<div class="row">
-					<form action="../Router/alunos_rotas.php" method="post">
-						<span id="msgAlerta"></span>
-						<h3>Cadastro de alunos</h3>
-						<input type="text" placeholder="ID" name="idAluno" id="idAluno" class="boxSecundario" autocomplete="off" readonly>
-						<input type="hidden" value="Aluno" id="escolha" name="escolha">
-						<input type="text" placeholder="Nome" name="NomeAluno" id="NomeAluno" class="boxSecundario2" autocomplete="off">
-
-						<input type="text" id="EmailAluno" name="EmailAluno" placeholder="Contato" class="boxSecundario2" autocomplete="off">
-
-						<select id="Turma_idTurma" name="Turma_idTurma" class="boxSecundario2 select-dark-mode required">
-							<option value="0">Turma</option>
-
-							<?php
-
-							include('../Controller/CGet_turma.php');
-							$turma = getTurmasFromDB(); // Chama a função para obter as turmas do banco
-
-							foreach ($turma as $idTurma => $nomeTurma) {
-								echo "<option value=\"$idTurma\">$nomeTurma</option>";
-							}
-
-
-							?>
-
-						</select>
-
-						<center><input type="submit" value="Enviar" class="inline-btn" name="action"></center>
-					</form>
-				</div>
-			</section>
 			<style>
 				/* Esconde as setas para campos de entrada numérica */
 				input[type=number]::-webkit-inner-spin-button,
@@ -173,15 +168,40 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 					-moz-appearance: textfield;
 					/* Firefox */
 				}
+
+				.btn-cadastrar-aluno {
+					background-color: #3BB143;
+					color: #fff;
+					border: none;
+					padding: 10px 20px;
+					border-radius: 8px;
+					font-weight: 600;
+					font-size: 15px;
+					display: inline-flex;
+					align-items: center;
+					gap: 8px;
+					transition: background-color 0.2s;
+					cursor: pointer;
+				}
+				.btn-cadastrar-aluno:hover {
+					background-color: #2e8b34;
+					color: #fff;
+				}
 			</style>
 			<main>
 				<div class="table-data">
 					<div class="order">
 						<div class="head">
 							<h3>Tabela de Cadastro de Alunos</h3>
+							<div style="display: flex; align-items: center; gap: 10px; margin-left: auto; flex-wrap: wrap;">
+								<button type="button" class="btn-cadastrar-aluno" data-bs-toggle="modal" data-bs-target="#cadAlunosModal">
+									<i class="fas fa-plus"></i> Cadastrar Aluno
+								</button>
 
-							<button class="btn btn-outline-success" id="pdf-button" aria-label="botão pdf" onclick="abrirAluno2()">
-								<i class="fas fa-file-pdf"></i>  Relatório de Alunos</button>
+								<button class="pdf-button" id="pdf-button" aria-label="botão pdf" onclick="abrirAluno2()">
+									<i class="fas fa-file-pdf"></i> Exportar Relatório PDF
+								</button>
+							</div>
 
 						</div>
 						<select id="filtroTurma" class="form-control" aria-label="Filtro por turma">
@@ -214,12 +234,58 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 					</div>
 				</div>
 
+				<!-- Criando Modal Cadastrar Aluno -->
+				<div class="modal fade" id="cadAlunosModal" tabindex="-1" aria-labelledby="cadAlunosModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="cadAlunosModalLabel">Cadastro de Aluno</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="font-size: 1.2rem; cursor: pointer;">&times;</button>
+							</div>
+							<div class="modal-body">
+								<form action="../Router/alunos_rotas.php" method="post" id="form-cad-aluno">
+									<input type="hidden" value="Aluno" id="escolha" name="escolha">
+
+									<div class="mb-3">
+										<label class="form-label">Nome do Aluno:</label>
+										<input type="text" placeholder="Nome do Aluno" name="NomeAluno" id="NomeAluno" required class="form-control" autocomplete="off">
+									</div>
+
+									<div class="mb-3">
+										<label class="form-label">Contato / E-mail:</label>
+										<input type="text" id="EmailAluno" name="EmailAluno" placeholder="Contato do Aluno" class="form-control" autocomplete="off">
+									</div>
+
+									<div class="mb-3">
+										<label class="form-label">Turma:</label>
+										<select id="Turma_idTurma" name="Turma_idTurma" class="form-control" required>
+											<option value="">Selecione uma Turma</option>
+											<?php
+											if (isset($turma)) {
+												foreach ($turma as $idTurma => $nomeTurma) {
+													echo "<option value=\"$idTurma\">$nomeTurma</option>";
+												}
+											}
+											?>
+										</select>
+									</div>
+								</form>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+								<button type="submit" form="form-cad-aluno" name="action" value="Enviar" class="btn btn-success">Cadastrar Aluno</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
 				<!-- Criando Modal Editar -->
 				<div class="modal fade" id="editAlunosModal" tabindex="-1" arial-labelledby="editAlunosModalLabel" arial-hidden="true">
 					<div class="modal-dialog">
 						<div class="modal-content">
 							<div class="modal-header">
 								<h5 class="modal-title" id="editAlunosModalLabel">Editar Alunos</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="font-size: 1.2rem; cursor: pointer;">&times;</button>
 							</div>
 							<div class="modal-body">
 								<span id="msgAlertErroEdit"></span>
@@ -388,11 +454,18 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 		language: {
 			url: "../lib/pt_br.json"
 		},
-		columnDefs: [{
-			"defaultContent": "-",
-			"targets": "_all",
-			"className": "dt-body-center"
-		}],
+		columnDefs: [
+			{
+				"targets": 0, // Oculta coluna Id
+				"visible": false,
+				"searchable": false
+			},
+			{
+				"defaultContent": "-",
+				"targets": "_all",
+				"className": "text-center"
+			}
+		],
 		"lengthMenu": [
 			[10, 15, 25, 50, 100, -1],
 			[10, 15, 25, 50, 100, "Tudo"]

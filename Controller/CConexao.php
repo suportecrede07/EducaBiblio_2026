@@ -1,6 +1,8 @@
 <?php
-// Inicialize a sessão
-session_start();
+// Inicialize a sessão caso não esteja ativa
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 class CConexao
 {

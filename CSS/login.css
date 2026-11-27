@@ -12,7 +12,29 @@
     padding: 0;
     font-family: "Poppins", sans-serif;
 }
+.esqueci-senha {
+    width: 100%;
+    max-width: 380px;
+    margin: 4px 0 12px 0;
+    text-align: right;
+    display: flex;
+    justify-content: flex-end;
+}
 
+.esqueci-senha a,
+.link-senha {
+    color: var(--verdePrincipal);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: color 0.3s ease, text-decoration 0.3s ease;
+}
+
+.esqueci-senha a:hover,
+.link-senha:hover {
+    color: var(--verdePrincipalHover);
+    text-decoration: underline;
+}
 .container {
     position: relative;
     width: 100%;

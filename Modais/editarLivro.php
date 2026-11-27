@@ -1,6 +1,7 @@
 <?php
 
 include_once '../Controller/CConexao.php';
+require_once '../Controller/CCad_livro.php';
 
 $conexao = new CConexao();
 $conn = $conexao->getConnection();
@@ -20,14 +21,30 @@ if (empty($dados['idLivro'])) {
 } elseif (empty($dados['idiomaLivro'])) {
     $retorna = ['status' => false, 'msg' => 'Erro: Necessário selecionar um idioma!'];
 } else {
-    $query_Livros = "UPDATE livro 
-                SET NomeLivro=:NomeLivro, 
-                EditoraLivro=:EditoraLivro, 
-                Tombo=:Tombo,
-                Genero_idGenero=:GeneroLivro,
-                Idioma_idIdioma=:IdiomaLivro
-                WHERE idLivro=:idLivro";
-    
+    $idAutor = null;
+    if (!empty($dados['NomeAutor'])) {
+        $livroCtrl = new LivroController();
+        $idAutor = $livroCtrl->buscarOuCriarAutor($conn, $dados['NomeAutor']);
+    }
+
+    if ($idAutor !== null) {
+        $query_Livros = "UPDATE livro 
+                    SET NomeLivro=:NomeLivro, 
+                    EditoraLivro=:EditoraLivro, 
+                    Tombo=:Tombo,
+                    Genero_idGenero=:GeneroLivro,
+                    Idioma_idIdioma=:IdiomaLivro,
+                    autor_idAutor=:idAutor
+                    WHERE idLivro=:idLivro";
+    } else {
+        $query_Livros = "UPDATE livro 
+                    SET NomeLivro=:NomeLivro, 
+                    EditoraLivro=:EditoraLivro, 
+                    Tombo=:Tombo,
+                    Genero_idGenero=:GeneroLivro,
+                    Idioma_idIdioma=:IdiomaLivro
+                    WHERE idLivro=:idLivro";
+    }
     
     $edit_Livros = $conn->prepare($query_Livros);
     $edit_Livros->bindParam(':idLivro', $dados['idLivro']);
@@ -36,6 +53,9 @@ if (empty($dados['idLivro'])) {
     $edit_Livros->bindParam(':Tombo', $dados['TomboLivro']);
     $edit_Livros->bindParam(':GeneroLivro', $dados['generoLivro']);
     $edit_Livros->bindParam(':IdiomaLivro', $dados['idiomaLivro']);
+    if ($idAutor !== null) {
+        $edit_Livros->bindParam(':idAutor', $idAutor, PDO::PARAM_INT);
+    }
 
     if ($edit_Livros->execute()) {
         $retorna = ['status' => true, 'msg' => '<div class="alert alert-success" role="alert">Livro editado com sucesso</div>'];

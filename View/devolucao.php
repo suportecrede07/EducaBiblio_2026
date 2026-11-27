@@ -272,11 +272,18 @@ $conn = $conexao->getConnection();
         language: {
             url: "../lib/pt_br.json"
         },
-        columnDefs: [{
-            "defaultContent": "-",
-            "targets": "_all",
-            "className": "dt-body-center"
-        }],
+        columnDefs: [
+            {
+                "targets": 0, // Oculta coluna ID
+                "visible": false,
+                "searchable": false
+            },
+            {
+                "defaultContent": "-",
+                "targets": "_all",
+                "className": "text-center"
+            }
+        ],
         "lengthMenu": [[10, 15, 25, 50, 100, -1], [10, 15, 25, 50, 100, "Tudo"]],
     });
 </script>

@@ -156,21 +156,14 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 
 		<body>
 
-			<section class="tabela">
-
-				<div class="row">
-					<form action="../Router/Rec_rotas.php" method="post" enctype="multipart/form-data">
-						<h3>Recomendações semanais</h3>
-						<input type="text" id="idRec" name="idRec" placeholder="ID" class="box3 select-dark-mode" autocomplete="off" readonly>
-						<input type="text" placeholder="Livro" name="LivroRec" id="LivroRec" class="box" autocomplete="off" required>
-						<input type="text" placeholder="Autor" name="AutorRec" id="AutorRec" class="box" autocomplete="off" required>
-						<input type="text" placeholder="Categoria" name="CatRec" id="CatRec" class="box" autocomplete="off" required>
-						<input type="file" name="ImgRec" id="ImgRec" class="box1">
-						<center><input type="submit" value="Enviar" class="inline-btn" name="atualizar"></center>
-					</form>
-				</div>
-			</section>
 			<style>
+				/* Alinhamento à esquerda para a tabela de recomendações */
+				#content main .table-data .order table th,
+				#content main .table-data .order table td {
+					text-align: left !important;
+					vertical-align: middle !important;
+				}
+
 				#content main .table-data .head h3 {
 					color: var(--cinzaEscuro);
 					margin-right: auto !important;
@@ -180,12 +173,35 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 					font-weight: bolder;
 					margin-top: -15px;
 				}
+
+				.btn-editar-rec-topo {
+					background-color: #3BB143;
+					color: #fff;
+					border: none;
+					padding: 10px 20px;
+					border-radius: 8px;
+					font-weight: 600;
+					font-size: 15px;
+					display: inline-flex;
+					align-items: center;
+					gap: 8px;
+					transition: background-color 0.2s;
+					cursor: pointer;
+					margin-bottom: 15px;
+				}
+				.btn-editar-rec-topo:hover {
+					background-color: #2e8b34;
+					color: #fff;
+				}
 			</style>
 			<main>
 				<div class="table-data">
 					<div class="order">
 						<div class="head">
-							<h3><br>Tabela de Recomendações<br> <br></h3>
+							<h3>Tabela de Recomendações</h3>
+							<button type="button" class="btn-editar-rec-topo" onclick="abrirNovaRec()">
+								<i class="fas fa-plus"></i> Nova Recomendação
+							</button>
 						</div>
 						<table>
 
@@ -220,24 +236,24 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 									echo "<table>";
 									echo "<thead>";
 									echo "<tr>";
-									echo "<th><center>Livro</center></th>";
-									echo "<th><center>ID</center></th>";
-									echo "<th><center>Autor</center></th>";
-									echo "<th><center>Categoria</center></th>";
-									echo "<th><center>Imagem</center></th>";
-									echo "<th><center>Editar</center></th>";
+									echo "<th>Livro</th>";
+									echo "<th>ID</th>";
+									echo "<th>Autor</th>";
+									echo "<th>Categoria</th>";
+									echo "<th>Imagem</th>";
+									echo "<th>Editar</th>";
 									echo "</tr>";
 									echo "</thead>";
 									echo "<tbody>";
 
 									foreach ($RecExibidos as $row) {
 										echo "<tr>";
-										echo "<td><center>" . $row["LivroRec"] . "</center></td>";
-										echo "<td><center>" . $row["idRec"] . "</center></td>";
-										echo "<td><center>" . $row["AutorRec"] . "</center></td>";
-										echo "<td><center>" . $row["CatRec"] . "</center></td>";
-										echo "<td><center><img src='" . $row["CamRec"] . "' alt='Imagem do Livro' /></center></td>";
-										echo "<td><center><button class='edit-button' data-id='$row[idRec]'><i class='fas fa-pencil-alt'></i></button></center></td>";
+										echo "<td>" . $row["LivroRec"] . "</td>";
+										echo "<td>" . $row["idRec"] . "</td>";
+										echo "<td>" . $row["AutorRec"] . "</td>";
+										echo "<td>" . $row["CatRec"] . "</td>";
+										echo "<td><img src='" . $row["CamRec"] . "' alt='Imagem do Livro' /></td>";
+										echo "<td><button class='edit-button' onclick='editarRec(" . $row["idRec"] . ")'><i class='fas fa-pencil-alt'></i></button></td>";
 										echo "</tr>";
 									}
 
@@ -259,6 +275,50 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 
 				</div>
 
+				<!-- Criando Modal Editar Recomendação -->
+				<div class="modal fade" id="modalRec" tabindex="-1" aria-labelledby="modalRecLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="modalRecLabel">Editar Recomendação</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="font-size: 1.2rem; cursor: pointer;">&times;</button>
+							</div>
+							<div class="modal-body">
+								<form action="../Router/Rec_rotas.php" method="post" id="form-rec" enctype="multipart/form-data">
+									<div class="mb-3">
+										<label class="form-label">ID da Recomendação:</label>
+										<input type="text" id="idRec" name="idRec" class="form-control" autocomplete="off" readonly>
+									</div>
+
+									<div class="mb-3">
+										<label class="form-label">Nome do Livro:</label>
+										<input type="text" placeholder="Nome do Livro" name="LivroRec" id="LivroRec" class="form-control" autocomplete="off" required>
+									</div>
+
+									<div class="mb-3">
+										<label class="form-label">Autor:</label>
+										<input type="text" placeholder="Nome do Autor" name="AutorRec" id="AutorRec" class="form-control" autocomplete="off" required>
+									</div>
+
+									<div class="mb-3">
+										<label class="form-label">Categoria:</label>
+										<input type="text" placeholder="Categoria" name="CatRec" id="CatRec" class="form-control" autocomplete="off" required>
+									</div>
+
+									<div class="mb-3">
+										<label class="form-label">Imagem de Capa:</label>
+										<input type="file" name="ImgRec" id="ImgRec" class="form-control">
+									</div>
+								</form>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+								<button type="submit" form="form-rec" name="atualizar" value="Enviar" class="btn btn-success">Salvar Recomendação</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
 				<footer class="footer">
 					© Copyright 2023 por <span>EducaBiblio</span> | Todos os direitos reservados
 				</footer>
@@ -271,34 +331,46 @@ if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true)
 </html>
 
 <script src="../JS/script.js"></script>
-<script src="../ArquivosExternos/Jquery.js"></script>
+<script src="../lib/jquery/jquery-3.7.1.min.js"></script>
+<script src="../lib/Bootstrap 2/bootstrap.bundle.min.js"></script>
 <script>
-	$(document).ready(function() {
-		// Capturar clique no botão de edição
-		$('.edit-button').click(function() {
-			// Obter o ID do item a ser editado
-			var id = $(this).data('id');
+	let modalRecObj;
 
-			// Encontrar os dados correspondentes na tabela e preencher o formulário
-			$('table tbody tr').each(function() {
-				var rowId = $(this).find('td:eq(1)').text(); // Considerando que o ID está na segunda coluna
-				if (rowId == id) {
-					var livro = $(this).find('td:eq(0)').text();
-					var autor = $(this).find('td:eq(2)').text();
-					var categoria = $(this).find('td:eq(3)').text();
+	function abrirNovaRec() {
+		if (!modalRecObj) {
+			modalRecObj = new bootstrap.Modal(document.getElementById('modalRec'));
+		}
+		$('#modalRecLabel').text('Nova Recomendação');
+		$('#idRec').val('');
+		$('#LivroRec').val('');
+		$('#AutorRec').val('');
+		$('#CatRec').val('');
+		$('#ImgRec').val('');
+		modalRecObj.show();
+	}
 
-					// Preencher os campos do formulário com os dados obtidos
-					$('#idRec').val(id);
-					$('#LivroRec').val(livro);
-					$('#AutorRec').val(autor);
-					$('#CatRec').val(categoria);
-					// Não está preenchendo o campo de imagem, pois é mais complexo
-					// Pode exigir uma lógica diferente ou uma abordagem de armazenamento/manipulação diferente
-					// ...
-				}
-			});
+	function editarRec(id) {
+		if (!modalRecObj) {
+			modalRecObj = new bootstrap.Modal(document.getElementById('modalRec'));
+		}
+		$('#modalRecLabel').text('Editar Recomendação');
+
+		$('table tbody tr').each(function() {
+			var rowId = $(this).find('td:eq(1)').text().trim();
+			if (rowId == id) {
+				var livro = $(this).find('td:eq(0)').text().trim();
+				var autor = $(this).find('td:eq(2)').text().trim();
+				var categoria = $(this).find('td:eq(3)').text().trim();
+
+				$('#idRec').val(id);
+				$('#LivroRec').val(livro);
+				$('#AutorRec').val(autor);
+				$('#CatRec').val(categoria);
+
+				modalRecObj.show();
+			}
 		});
-	});
+	}
 </script>
 </body>
 
