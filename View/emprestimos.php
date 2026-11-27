@@ -238,7 +238,7 @@ $conn = $conexao->getConnection();
 								<form action="../Router/emp_rotas.php" method="post" id="form-cad-emp">
 									<div class="mb-3">
 										<label class="form-label">Gênero:</label>
-										<select id="Genero_idGenero" class="form-control" required>
+										<select id="Genero_idGenero" name="genero_idGenero" class="form-control" required>
 											<option value="">Selecione um gênero</option>
 											<?php
 											$query = "SELECT idGenero, NomeGenero FROM genero";
@@ -272,14 +272,14 @@ $conn = $conexao->getConnection();
 										</select>
 									</div>
 
-									<div class="mb-3">
+									<div class="mb-3" id="div_cad_prof" style="display: none;">
 										<label class="form-label">Professor:</label>
 										<select id="prof_idProf" name="prof_idProf" class="form-control">
 											<option value="">Selecione um professor</option>
 										</select>
 									</div>
 
-									<div class="mb-3">
+									<div class="mb-3" id="div_cad_aluno" style="display: none;">
 										<label class="form-label">Aluno:</label>
 										<select id="aluno_idAluno" name="aluno_idAluno" class="form-control">
 											<option value="">Selecione um aluno</option>
@@ -811,6 +811,8 @@ $conn = $conexao->getConnection();
 	$(document).ready(function() {
 		function toggleSelects() {
 			var turmaId = $("#Turma_idTurma").val();
+			var divAluno = $("#div_cad_aluno");
+			var divProf = $("#div_cad_prof");
 			var alunoSelect = $("#aluno_idAluno");
 			var profSelect = $("#prof_idProf");
 
@@ -826,25 +828,43 @@ $conn = $conexao->getConnection();
 					data: requestData,
 					success: function(data) {
 						if (turmaId === '0') {
-							alunoSelect.hide().html('');
-							profSelect.html(data).show();
+							divAluno.hide();
+							alunoSelect.prop("required", false).html('');
+							profSelect.html(data).prop("required", true);
+							divProf.show();
 						} else {
-							profSelect.hide().html('');
-							alunoSelect.html(data).show();
+							divProf.hide();
+							profSelect.prop("required", false).html('');
+							alunoSelect.html(data).prop("required", true);
+							divAluno.show();
 						}
 					},
 					error: function() {
-						alunoSelect.html("<option value=''>Erro ao carregar alunos</option>").show();
-						profSelect.html("<option value=''>Erro ao carregar professores</option>").show();
+						if (turmaId === '0') {
+							profSelect.html("<option value=''>Erro ao carregar professores</option>");
+							divProf.show();
+							divAluno.hide();
+						} else {
+							alunoSelect.html("<option value=''>Erro ao carregar alunos</option>");
+							divAluno.show();
+							divProf.hide();
+						}
 					}
 				});
 			} else {
-				alunoSelect.show();
-				profSelect.hide().html('');
+				divAluno.hide();
+				divProf.hide();
+				alunoSelect.prop("required", false).html('<option value="">Selecione um aluno</option>');
+				profSelect.prop("required", false).html('<option value="">Selecione um professor</option>');
 			}
 		}
 
-		// Verifica o valor da turma ao carregar a página
+		// Ao abrir o modal, reseta os selects
+		$('#cadEmpModal').on('shown.bs.modal', function () {
+			toggleSelects();
+		});
+
+		// Executa ao carregar a página
 		toggleSelects();
 
 		// Ao mudar o valor da turma
