@@ -4,9 +4,17 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Verifica se recebeu o token de recuperação pela URL
-$token = isset($_GET['token']) ? trim($_GET['token']) : '';
-$modoRedefinicao = !empty($token);
+// Verifica se o e-mail foi validado na sessão ou recebido para redefinição
+$emailValidado = $_SESSION['recuperar_email'] ?? '';
+$etapa = isset($_SESSION['recuperar_etapa']) ? $_SESSION['recuperar_etapa'] : 'identificacao';
+
+// Se o usuário clicar em reiniciar/voltar
+if (isset($_GET['nova_consulta'])) {
+    unset($_SESSION['recuperar_email']);
+    unset($_SESSION['recuperar_etapa']);
+    header("Location: recuperarLogin.php");
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -17,10 +25,9 @@ $modoRedefinicao = !empty($token);
   <script src="../ArquivosExternos/icons.js"></script>
   <link rel="stylesheet" href="../CSS/login.css?v=<?php echo time(); ?>" />
   <link rel="shortcut icon" href="../img/icon1.png" type="image/x-icon">
-  <title>Recuperação de Acesso - EducaBiblio</title>
+  <title>Recuperação de Senha - EducaBiblio</title>
 
   <style>
-    
     .container::before {
       display: none !important;
     }
@@ -97,6 +104,7 @@ $modoRedefinicao = !empty($token);
       font-size: 0.9rem;
       text-align: center;
       font-weight: 500;
+      box-sizing: border-box;
     }
 
     .alert-success {
@@ -109,6 +117,19 @@ $modoRedefinicao = !empty($token);
       background-color: #f8d7da;
       color: #721c24;
       border: 1px solid #f5c6cb;
+    }
+
+    .info-usuario-encontrado {
+      background-color: #e8f4fd;
+      border: 1px solid #bee5eb;
+      color: #0c5460;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      width: 100%;
+      max-width: 380px;
+      font-size: 0.9rem;
+      box-sizing: border-box;
     }
 
     .voltar-login {
@@ -128,44 +149,35 @@ $modoRedefinicao = !empty($token);
       text-decoration: underline;
     }
 
-    .opcoes-alterar {
-      width: 100%;
-      max-width: 380px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 12px;
-      text-align: left;
+    .input-field {
+      position: relative;
     }
 
-    .opcoes-alterar label {
-      font-size: 0.9rem;
-      color: #494949;
-      font-weight: 500;
+    .input-field .toggle-password {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      color: #acacac;
     }
 
-    .campo-bloco {
-      width: 100%;
-      max-width: 380px;
-      transition: all 0.3s ease;
+    .input-field .toggle-password:hover {
+      color: #333;
     }
   </style>
 </head>
 
 <body>
   <div class="container">
-    <div class="forms-container" style="display: flex; justify-content: center; align-items: center;">
+    <div class="forms-container">
       <div class="recuperar-container">
         
         <h2 class="tituloPrincipal">
-          <?php echo $modoRedefinicao ? "Redefinir Acesso" : "Recuperar Conta"; ?>
+          <?php echo ($etapa === 'redefinir') ? "Nova Senha" : "Recuperar Senha"; ?>
         </h2>
 
-        <!-- Mensagens do backend -->
+        <!-- Mensagens de feedback -->
         <?php if (isset($_SESSION['msg_sucesso'])): ?>
           <div class="alert-msg alert-success">
             <?php echo $_SESSION['msg_sucesso']; unset($_SESSION['msg_sucesso']); ?>
@@ -178,91 +190,83 @@ $modoRedefinicao = !empty($token);
           </div>
         <?php endif; ?>
 
-        <?php if (!$modoRedefinicao): ?>
-          <!-- 1. Enviar link para o e-mail -->
+        <?php if ($etapa !== 'redefinir'): ?>
+          <!-- ETAPA 1: Verificação de E-mail no banco -->
           <p class="subtituloRecuperar">
-            Informe seu e-mail para receber o link de recuperação de usuário e senha.
+            Digite o e-mail cadastrado na sua conta para verificar os dados no sistema.
           </p>
 
-          <form action="../Router/log_rotas.php" method="POST" style="width: 100%; padding: 0;">
-            <input type="hidden" name="action" value="SolicitarRecuperacao" />
+          <form action="../Router/log_rotas.php" method="POST" style="width: 100%; padding: 0; display: flex; flex-direction: column; align-items: center;">
+            <input type="hidden" name="action" value="VerificarEmailRecuperacao" />
 
             <div class="input-field">
               <i class="fas fa-envelope"></i>
               <input type="email" name="EmailUsuario" id="EmailUsuario" placeholder="E-mail cadastrado" required autocomplete="off" />
             </div>
 
-            <input type="submit" value="Enviar Link" class="btn solid" style="margin-top: 15px;" />
+            <input type="submit" value="Continuar" class="btn solid" style="margin-top: 15px;" />
           </form>
 
         <?php else: ?>
-          <!-- 2. Alterar usuário e/ou senha -->
+          <!-- ETAPA 2: Redefinição de Senha -->
+          <div class="info-usuario-encontrado">
+            Conta encontrada para: <strong><?php echo htmlspecialchars($emailValidado); ?></strong>
+            <br>
+            <a href="recuperarLogin.php?nova_consulta=1" style="color: #0b5885; font-size: 0.82rem; text-decoration: underline;">Trocar e-mail</a>
+          </div>
+
           <p class="subtituloRecuperar">
-            Selecione o que deseja alterar:
+            Crie sua nova senha para acessar a plataforma.
           </p>
 
-          <form action="../Router/log_rotas.php" method="POST" id="formRedefinicao" style="width: 100%; padding: 0;">
-            <input type="hidden" name="action" value="RedefinirAcesso" />
-            <input type="hidden" name="token" value="<?php echo htmlspecialchars($token); ?>" />
+          <form action="../Router/log_rotas.php" method="POST" id="formRedefinirSenha" style="width: 100%; padding: 0; display: flex; flex-direction: column; align-items: center;">
+            <input type="hidden" name="action" value="SalvarNovaSenha" />
 
-            <div class="opcoes-alterar">
-              <label>
-                <input type="checkbox" id="chkAlterarUsuario" onchange="alternarCampos()" checked />
-                Alterar Usuário
-              </label>
-              <label>
-                <input type="checkbox" id="chkAlterarSenha" onchange="alternarCampos()" checked />
-                Alterar Senha
-              </label>
+            <!-- Campo Nova Senha -->
+            <div class="input-field">
+              <i class="fas fa-lock"></i>
+              <input type="password" name="NovaSenhaUsuario" id="NovaSenhaUsuario" placeholder="Nova Senha" required autocomplete="off" />
+              <i class="fas fa-eye toggle-password" onclick="toggleSenha('NovaSenhaUsuario', this)"></i>
             </div>
 
-            <!-- Campo Novo Usuário -->
-            <div class="campo-bloco" id="blocoUsuario">
-              <div class="input-field">
-                <i class="fas fa-user-alt"></i>
-                <input type="text" name="NovoUserUsuario" id="NovoUserUsuario" placeholder="Novo Usuário" autocomplete="off" />
-              </div>
+            <!-- Campo Confirmar Senha -->
+            <div class="input-field">
+              <i class="fas fa-check-circle"></i>
+              <input type="password" name="ConfirmarSenha" id="ConfirmarSenha" placeholder="Confirmar Nova Senha" required autocomplete="off" />
+              <i class="fas fa-eye toggle-password" onclick="toggleSenha('ConfirmarSenha', this)"></i>
             </div>
 
-            <!-- Campos Nova Senha -->
-            <div class="campo-bloco" id="blocoSenha">
-              <div class="input-field">
-                <i class="fas fa-lock"></i>
-                <input type="password" name="NovaSenhaUsuario" id="NovaSenhaUsuario" placeholder="Nova Senha" autocomplete="off" />
-              </div>
-
-              <div class="input-field">
-                <i class="fas fa-check-circle"></i>
-                <input type="password" name="ConfirmarSenha" id="ConfirmarSenha" placeholder="Confirmar Senha" autocomplete="off" />
-              </div>
-            </div>
-
-            <input type="submit" value="Salvar" class="btn solid" style="margin-top: 15px;" />
+            <input type="submit" value="Salvar Nova Senha" class="btn solid" style="margin-top: 15px;" />
           </form>
 
           <script>
-            function alternarCampos() {
-              const chkUser = document.getElementById('chkAlterarUsuario');
-              const chkSenha = document.getElementById('chkAlterarSenha');
-              document.getElementById('blocoUsuario').style.display = chkUser.checked ? 'block' : 'none';
-              document.getElementById('blocoSenha').style.display = chkSenha.checked ? 'block' : 'none';
+            function toggleSenha(inputId, icon) {
+              const input = document.getElementById(inputId);
+              if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+              } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+              }
             }
 
-            document.getElementById('formRedefinicao')?.addEventListener('submit', function(e) {
-              const chkSenha = document.getElementById('chkAlterarSenha');
-              if (chkSenha.checked) {
-                const senha = document.getElementById('NovaSenhaUsuario').value;
-                const confirma = document.getElementById('ConfirmarSenha').value;
-                if (!senha || senha.length < 4) {
-                  alert('A senha deve ter no mínimo 4 caracteres.');
-                  e.preventDefault();
-                  return;
-                }
-                if (senha !== confirma) {
-                  alert('As senhas não coincidem.');
-                  e.preventDefault();
-                  return;
-                }
+            document.getElementById('formRedefinirSenha')?.addEventListener('submit', function(e) {
+              const senha = document.getElementById('NovaSenhaUsuario').value;
+              const confirma = document.getElementById('ConfirmarSenha').value;
+
+              if (senha.length < 4) {
+                alert('A senha deve ter pelo menos 4 caracteres.');
+                e.preventDefault();
+                return;
+              }
+
+              if (senha !== confirma) {
+                alert('As senhas não coincidem. Digite novamente.');
+                e.preventDefault();
+                return;
               }
             });
           </script>

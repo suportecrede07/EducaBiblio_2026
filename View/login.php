@@ -48,6 +48,11 @@
           if (isset($_GET['erro']) && $_GET['erro'] == 1) {
             echo '<div class="error-message">Nome de usuário ou senha incorretos.</div>';
           }
+          if (isset($_GET['redefinido']) && $_GET['redefinido'] == 1) {
+            $msgSucesso = $_SESSION['sucesso_login'] ?? 'Senha redefinida com sucesso! Faça login com a nova senha.';
+            unset($_SESSION['sucesso_login']);
+            echo '<div style="color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-weight: 500; text-align: center; max-width: 380px; width: 100%; box-sizing: border-box;">' . htmlspecialchars($msgSucesso) . '</div>';
+          }
           ?>
 
           <div class="input-field">

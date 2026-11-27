@@ -42,6 +42,103 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Você pode redirecionar para uma página de erro se preferir
             exit();
         }
+    } elseif (isset($_POST['action']) && $_POST['action'] === 'VerificarEmailRecuperacao') {
+        $email = trim($_POST['EmailUsuario'] ?? '');
+
+        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $_SESSION['msg_erro'] = "Por favor, informe um endereço de e-mail válido.";
+            header("Location: ../View/recuperarLogin.php");
+            exit();
+        }
+
+        $conexaoObj = new CConexao();
+        $conn = $conexaoObj->getConnection();
+
+        try {
+            $sql = "SELECT idUsuario, EmailUsuario FROM usuario WHERE EmailUsuario = :email LIMIT 1";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':email', $email);
+            $stmt->execute();
+            $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($usuario) {
+                // E-mail encontrado no banco: avança para a etapa de redefinição
+                $_SESSION['recuperar_email'] = $usuario['EmailUsuario'];
+                $_SESSION['recuperar_etapa'] = 'redefinir';
+                header("Location: ../View/recuperarLogin.php");
+                exit();
+            } else {
+                // E-mail não encontrado no banco: barra e exibe erro
+                $_SESSION['msg_erro'] = "O e-mail informado não foi encontrado em nosso sistema.";
+                header("Location: ../View/recuperarLogin.php");
+                exit();
+            }
+        } catch (PDOException $e) {
+            $_SESSION['msg_erro'] = "Erro ao consultar o banco de dados: " . $e->getMessage();
+            header("Location: ../View/recuperarLogin.php");
+            exit();
+        }
+    } elseif (isset($_POST['action']) && $_POST['action'] === 'SalvarNovaSenha') {
+        $email = $_SESSION['recuperar_email'] ?? '';
+        $novaSenha = $_POST['NovaSenhaUsuario'] ?? '';
+        $confirmaSenha = $_POST['ConfirmarSenha'] ?? '';
+
+        if (empty($email)) {
+            $_SESSION['msg_erro'] = "Sessão expirada. Por favor, informe seu e-mail novamente.";
+            header("Location: ../View/recuperarLogin.php");
+            exit();
+        }
+
+        if (empty($novaSenha) || strlen($novaSenha) < 4) {
+            $_SESSION['msg_erro'] = "A nova senha deve ter no mínimo 4 caracteres.";
+            header("Location: ../View/recuperarLogin.php");
+            exit();
+        }
+
+        if ($novaSenha !== $confirmaSenha) {
+            $_SESSION['msg_erro'] = "As senhas não coincidem.";
+            header("Location: ../View/recuperarLogin.php");
+            exit();
+        }
+
+        $conexaoObj = new CConexao();
+        $conn = $conexaoObj->getConnection();
+
+        try {
+            // Obtém o nome do usuário antes de atualizar para personalizar o e-mail
+            $stmtUser = $conn->prepare("SELECT NomeUsuario, UserUsuario FROM usuario WHERE EmailUsuario = :email LIMIT 1");
+            $stmtUser->bindParam(':email', $email);
+            $stmtUser->execute();
+            $dadosUsuario = $stmtUser->fetch(PDO::FETCH_ASSOC);
+            $nomeDestinatario = $dadosUsuario['NomeUsuario'] ?? ($dadosUsuario['UserUsuario'] ?? '');
+
+            $sql = "UPDATE usuario SET SenhaUsuario = :senha WHERE EmailUsuario = :email";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':senha', $novaSenha);
+            $stmt->bindParam(':email', $email);
+
+            if ($stmt->execute()) {
+                // Envia o e-mail de confirmação usando EnvioEmail.php
+                require_once __DIR__ . '/EnvioEmail.php';
+                enviarEmailSenhaRedefinida($email, $nomeDestinatario);
+
+                // Limpa os dados de recuperação da sessão
+                unset($_SESSION['recuperar_email']);
+                unset($_SESSION['recuperar_etapa']);
+
+                $_SESSION['sucesso_login'] = "Senha redefinida com sucesso! Um e-mail de confirmação foi enviado para sua caixa de entrada.";
+                header("Location: ../View/login.php?redefinido=1");
+                exit();
+            } else {
+                $_SESSION['msg_erro'] = "Erro ao atualizar a senha. Tente novamente.";
+                header("Location: ../View/recuperarLogin.php");
+                exit();
+            }
+        } catch (PDOException $e) {
+            $_SESSION['msg_erro'] = "Erro no banco de dados: " . $e->getMessage();
+            header("Location: ../View/recuperarLogin.php");
+            exit();
+        }
     }
 }
 

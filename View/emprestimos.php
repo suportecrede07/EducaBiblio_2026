@@ -1,13 +1,18 @@
 <?php
 
-// Inclua o arquivo de conexão ao banco de dados.
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 include_once '../Controller/CConexao.php';
 
-// Verificar se o usuário está logado
 if (!isset($_SESSION['usuario_logado']) || $_SESSION['usuario_logado'] !== true) {
-	header("Location: ../View/login.php"); // Redirecionar para a página de login se não estiver logado
-	exit();
+    header("Location: ../View/login.php");
+    exit();
 }
+
+$conexao = new CConexao();
+$conn = $conexao->getConnection();
 
 if (isset($_GET['msg'])) {
 	$mensagens = [
@@ -188,6 +193,7 @@ $conn = $conexao->getConnection();
 					transition: background-color 0.2s;
 					cursor: pointer;
 				}
+
 				.btn-cadastrar-emp:hover {
 					background-color: #2e8b34;
 					color: #fff;
@@ -302,18 +308,39 @@ $conn = $conexao->getConnection();
 									</div>
 
 									<div class="mb-3">
-										<label class="form-label">Responsável pelo Empréstimo:</label>
-										<select id="usuario_idUsuario" name="usuario_idUsuario" class="form-control" required>
-											<option value="">Selecione um usuário</option>
-											<?php
-											$query = "SELECT idUsuario, UserUsuario FROM usuario";
-											$stmt = $conn->query($query);
-											while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-												echo "<option value='" . $row['idUsuario'] . "'>" . $row['UserUsuario'] . "</option>";
-											}
-											?>
-										</select>
-									</div>
+    <label class="form-label">Responsável pelo Empréstimo:</label>
+
+    <select id="usuario_idUsuario"
+            name="usuario_idUsuario"
+            class="form-control"
+            required>
+
+        <?php
+
+        $username = $_SESSION['nomeDoUsuario'] ?? '';
+
+        $query = "SELECT idUsuario, UserUsuario
+                  FROM usuario
+                  WHERE UserUsuario = :username";
+
+        $stmt = $conn->prepare($query);
+        $stmt->bindValue(':username', $username);
+        $stmt->execute();
+
+        $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($usuario) {
+            echo '<option value="' . htmlspecialchars($usuario['idUsuario']) . '" selected>';
+            echo htmlspecialchars($usuario['UserUsuario']);
+            echo '</option>';
+        } else {
+            echo '<option value="">Usuário não encontrado</option>';
+        }
+
+        ?>
+
+    </select>
+</div>
 								</form>
 							</div>
 							<div class="modal-footer">
@@ -963,26 +990,59 @@ $conn = $conexao->getConnection();
 		language: {
 			url: "../lib/pt_br.json"
 		},
-		columns: [
-			{ width: "22%", className: "text-start" }, // Livro (0)
-			{ width: "10%", className: "text-start" }, // Gênero (1)
-			{ visible: false, searchable: false },      // Id (2)
-			{ width: "6%",  className: "text-start" }, // Ano (3)
-			{ width: "8%",  className: "text-start" }, // Turma (4)
-			{ width: "16%", className: "text-start" }, // Leitor (5)
-			{ width: "11%", className: "text-start" }, // Data Empréstimo (6)
-			{ width: "11%", className: "text-start" }, // Data Devolução (7)
-			{ width: "4%",  className: "text-center" }, // Visualizar (8)
-			{ width: "4%",  className: "text-center" }, // Editar (9)
-			{ width: "4%",  className: "text-center" }, // Renovar (10)
-			{ width: "4%",  className: "text-center" }  // Excluir (11)
-		],
-		columnDefs: [
+		columns: [{
+				width: "22%",
+				className: "text-start"
+			}, // Livro (0)
 			{
-				"defaultContent": "-",
-				"targets": "_all"
-			}
+				width: "10%",
+				className: "text-start"
+			}, // Gênero (1)
+			{
+				visible: false,
+				searchable: false
+			}, // Id (2)
+			{
+				width: "6%",
+				className: "text-start"
+			}, // Ano (3)
+			{
+				width: "8%",
+				className: "text-start"
+			}, // Turma (4)
+			{
+				width: "16%",
+				className: "text-start"
+			}, // Leitor (5)
+			{
+				width: "11%",
+				className: "text-start"
+			}, // Data Empréstimo (6)
+			{
+				width: "11%",
+				className: "text-start"
+			}, // Data Devolução (7)
+			{
+				width: "4%",
+				className: "text-center"
+			}, // Visualizar (8)
+			{
+				width: "4%",
+				className: "text-center"
+			}, // Editar (9)
+			{
+				width: "4%",
+				className: "text-center"
+			}, // Renovar (10)
+			{
+				width: "4%",
+				className: "text-center"
+			} // Excluir (11)
 		],
+		columnDefs: [{
+			"defaultContent": "-",
+			"targets": "_all"
+		}],
 		"lengthMenu": [
 			[10, 15, 25, 50, 100, -1],
 			[10, 15, 25, 50, 100, "Tudo"]
